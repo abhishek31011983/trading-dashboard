@@ -13,6 +13,7 @@ client = gspread.authorize(creds)
 # 2. Open your Sheet
 sheet = client.open_by_key('1hqg0c7PGiEaxC-PpOuyCSfivwyhPKgS0mpbNIa55Zio')
 dash_tab = sheet.worksheet("dashboard")
+cash_tab = sheet.worksheet("Cash")
 
 # 3. Fetch Data
 # Main Metrics
@@ -33,12 +34,48 @@ monthly_values = dash_tab.col_values(3)[14:26] # Column C (Closed P&L)
 segment_labels = dash_tab.col_values(7)[14:21] # Column G (Segment)
 segment_values = dash_tab.col_values(8)[14:21] # Column H (P&L)
 
+# Cash sheet data - all rows starting from row 2 (skip header)
+cash_data_raw = cash_tab.get_all_values()
+headers = cash_data_raw[0] if cash_data_raw else []
+trades = []
+
+for row in cash_data_raw[1:]:  # Skip header row
+    if len(row) >= 11:  # Ensure row has enough columns
+        trades.append({
+            "status": row[0] if len(row) > 0 else "",
+            "entry_date": row[1] if len(row) > 1 else "",
+            "name": row[2] if len(row) > 2 else "",
+            "current_price": row[3] if len(row) > 3 else "",
+            "type": row[4] if len(row) > 4 else "",
+            "instrument": row[5] if len(row) > 5 else "",
+            "segment": row[6] if len(row) > 6 else "",
+            "shares": row[7] if len(row) > 7 else "",
+            "entry_price": row[8] if len(row) > 8 else "",
+            "total_amount": row[9] if len(row) > 9 else "",
+            "stop_loss": row[10] if len(row) > 10 else "",
+            "risk_share": row[11] if len(row) > 11 else "",
+            "total_risk": row[12] if len(row) > 12 else "",
+            "tsl": row[13] if len(row) > 13 else "",
+            "open_risk_share": row[14] if len(row) > 14 else "",
+            "total_open_risk": row[15] if len(row) > 15 else "",
+            "portfolio_size": row[16] if len(row) > 16 else "",
+            "risk_on_portfolio": row[17] if len(row) > 17 else "",
+            "exit_price": row[18] if len(row) > 18 else "",
+            "pl_share": row[19] if len(row) > 19 else "",
+            "total_pl": row[20] if len(row) > 20 else "",
+            "rr_achieved": row[21] if len(row) > 21 else "",
+            "comments": row[22] if len(row) > 22 else "",
+            "market_conditions": row[23] if len(row) > 23 else ""
+        })
+
 data = {
     "metrics": metrics,
     "charts": {
         "monthly": {"labels": monthly_labels, "values": monthly_values},
         "segment": {"labels": segment_labels, "values": segment_values}
-    }
+    },
+    "trades": trades,
+    "headers": headers
 }
 
 # 4. Save to JSON
