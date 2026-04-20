@@ -6,8 +6,12 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/searchpanes/2.2.0/css/searchPanes.dataTables.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/searchpanes/2.2.0/js/dataTables.searchPanes.min.js"></script>
+    <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; }
         .metric-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
@@ -22,11 +26,12 @@
         .table-container { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
         table.dataTable { font-size: 0.875rem; }
         table.dataTable thead th { background: #f8fafc; font-weight: 600; }
+        .dtsp-searchPanes { margin-bottom: 20px; }
+        .dtsp-searchPane { border-radius: 8px; }
     </style>
 </head>
 <body class="bg-gray-50">
     <div class="min-h-screen flex">
-        <!-- Sidebar -->
         <div class="w-64 bg-white border-r border-gray-200 p-6">
             <h1 class="text-2xl font-bold text-gray-900 mb-8">Trading Pro</h1>
             <nav>
@@ -36,9 +41,7 @@
             </nav>
         </div>
         
-        <!-- Main Content -->
         <div class="flex-1 p-8">
-            <!-- Live Journal Tab -->
             <div id="journal" class="tab-content active">
                 <h2 class="text-3xl font-bold text-gray-900 mb-8">Live Trading Journal</h2>
                 <div class="table-container">
@@ -51,11 +54,8 @@
                 </div>
             </div>
             
-            <!-- Overview Tab -->
             <div id="overview" class="tab-content">
                 <h2 class="text-3xl font-bold text-gray-900 mb-8">Performance Overview</h2>
-                
-                <!-- Metrics Grid -->
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
                     <div class="metric-card">
                         <div class="metric-label">Net P&L</div>
@@ -70,8 +70,6 @@
                         <div class="metric-value" id="pf">0</div>
                     </div>
                 </div>
-                
-                <!-- Charts -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="chart-container">
                         <h3 class="text-lg font-semibold text-gray-700 mb-4">Monthly Performance</h3>
@@ -84,10 +82,8 @@
                 </div>
             </div>
             
-            <!-- Risk Tab -->
             <div id="risk" class="tab-content">
                 <h2 class="text-3xl font-bold text-gray-900 mb-8">Risk Analysis</h2>
-                
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="metric-card">
                         <div class="metric-label">Open Risk</div>
@@ -119,13 +115,11 @@
                 const response = await fetch('data.json');
                 const data = await response.json();
                 
-                // Update metrics
                 document.getElementById('pnl').innerText = data.metrics.net_pnl;
                 document.getElementById('win').innerText = data.metrics.win_rate;
                 document.getElementById('pf').innerText = data.metrics.profit_factor;
                 document.getElementById('risk').innerText = data.metrics.open_risk;
                 
-                // Load journal table
                 if (data.trades && data.trades.length > 0) {
                     const headers = data.headers || Object.keys(data.trades[0]);
                     const headerRow = document.getElementById('tableHeaders');
@@ -139,15 +133,21 @@
                         }).join('') + '</tr>';
                     }).join('');
                     
-                    // Initialize DataTable
                     $('#tradesTable').DataTable({
                         pageLength: 25,
-                        order: [[1, 'desc']], // Sort by date
-                        responsive: true
+                        order: [[1, 'desc']],
+                        dom: 'Pfrtip',
+                        searchPanes: {
+                            cascadePanes: true,
+                            viewTotal: true,
+                            columns: [0, 4, 5, 6]
+                        },
+                        columnDefs: [
+                            { searchPanes: { show: true }, targets: [0, 4, 5, 6] }
+                        ]
                     });
                 }
                 
-                // Monthly Chart
                 new Chart(document.getElementById('monthlyChart'), {
                     type: 'bar',
                     data: {
@@ -165,13 +165,10 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         plugins: { legend: { display: false } },
-                        scales: {
-                            y: { beginAtZero: true }
-                        }
+                        scales: { y: { beginAtZero: true } }
                     }
                 });
                 
-                // Segment Chart
                 const validSegments = data.charts.segment.labels
                     .map((label, i) => ({ label, value: data.charts.segment.values[i] }))
                     .filter(s => s.label && s.value !== '₹0.00');
@@ -188,9 +185,7 @@
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        plugins: {
-                            legend: { position: 'bottom' }
-                        }
+                        plugins: { legend: { position: 'bottom' } }
                     }
                 });
             } catch (error) {
