@@ -6,53 +6,157 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .metric { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .side-btn { width: 100%; text-align: left; padding: 10px; border-radius: 6px; cursor: pointer; margin-bottom: 5px; }
-        .active { background: #1f2937 !important; color: white !important; }
-        .tab { display: none; } .tab-active { display: block; }
+        body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; }
+        .metric-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .metric-value { font-size: 2rem; font-weight: 700; color: #1e293b; margin-top: 8px; }
+        .metric-label { font-size: 0.875rem; font-weight: 500; color: #64748b; text-transform: uppercase; letter-spacing: 0.025em; }
+        .side-btn { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; cursor: pointer; margin-bottom: 6px; font-weight: 500; transition: all 0.2s; background: transparent; color: #475569; }
+        .side-btn:hover { background: #f1f5f9; }
+        .side-btn.active { background: #3b82f6; color: white; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .chart-container { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: 320px; }
     </style>
 </head>
-<body class="bg-gray-100 flex font-sans">
-    <div class="w-56 h-screen bg-white border-r p-5">
-        <h1 class="font-bold text-xl mb-10">Trading Pro</h1>
-        <div onclick="tab('ov')" id="b-ov" class="side-btn active">Overview</div>
-        <div onclick="tab('rk')" id="b-rk" class="side-btn">Risk Analysis</div>
-    </div>
-    <div class="flex-1 p-10 overflow-auto">
-        <div id="ov" class="tab tab-active">
-            <div class="grid grid-cols-3 gap-5 mb-10">
-                <div class="metric"><p class="text-xs text-gray-400 uppercase font-bold">Net P&L</p><h2 id="pnl" class="text-2xl font-bold text-green-600">₹0</h2></div>
-                <div class="metric"><p class="text-xs text-gray-400 uppercase font-bold">Win Rate</p><h2 id="win" class="text-2xl font-bold text-blue-600">0%</h2></div>
-                <div class="metric"><p class="text-xs text-gray-400 uppercase font-bold">Profit Factor</p><h2 id="pf" class="text-2xl font-bold text-purple-600">0</h2></div>
+<body class="bg-gray-50">
+    <div class="min-h-screen flex">
+        <!-- Sidebar -->
+        <div class="w-64 bg-white border-r border-gray-200 p-6">
+            <h1 class="text-2xl font-bold text-gray-900 mb-8">Trading Pro</h1>
+            <nav>
+                <button onclick="switchTab('overview')" id="btn-overview" class="side-btn active">📊 Overview</button>
+                <button onclick="switchTab('risk')" id="btn-risk" class="side-btn">⚠️ Risk Analysis</button>
+            </nav>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="flex-1 p-8">
+            <!-- Overview Tab -->
+            <div id="overview" class="tab-content active">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8">Performance Overview</h2>
+                
+                <!-- Metrics Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="metric-card">
+                        <div class="metric-label">Net P&L</div>
+                        <div class="metric-value" id="pnl">₹0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Win Rate</div>
+                        <div class="metric-value" id="win">0%</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Profit Factor</div>
+                        <div class="metric-value" id="pf">0</div>
+                    </div>
+                </div>
+                
+                <!-- Charts -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="chart-container">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Monthly Performance</h3>
+                        <canvas id="monthlyChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Segment Breakdown</h3>
+                        <canvas id="segmentChart"></canvas>
+                    </div>
+                </div>
             </div>
-            <div class="grid grid-cols-2 gap-5">
-                <div class="bg-white p-5 rounded shadow"><b>Monthly</b>anvas id="c1"></canvas></div>
-                <div class="bg-white p-5 rounded shadow"><b>Segments</b>anvas id="c2"></canvas></div>
+            
+            <!-- Risk Tab -->
+            <div id="risk" class="tab-content">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8">Risk Analysis</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="metric-card">
+                        <div class="metric-label">Open Risk</div>
+                        <div class="metric-value" id="risk">₹0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Max Drawdown</div>
+                        <div class="metric-value">Coming Soon</div>
+                    </div>
+                </div>
             </div>
         </div>
-        <div id="rk" class="tab">
-            <div class="metric border-l-4 border-red-500"><p class="text-xs text-gray-400 uppercase font-bold">Open Risk</p><h2 id="risk" class="text-2xl font-bold text-red-600">₹0</h2></div>
-        </div>
     </div>
+    
     <script>
-        function tab(id) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('tab-active');
-            document.getElementById('b-'+id).classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+            document.getElementById('btn-' + tabName).classList.add('active');
         }
-        function parse(v) { return parseFloat(v.replace(/[₹,()]/g, '')) * (v.includes('(')?-1:1); }
-        async function start() {
-            const r = await fetch('data.json');
-            const d = await r.json();
-            document.getElementById('pnl').innerText = d.metrics.net_pnl;
-            document.getElementById('win').innerText = d.metrics.win_rate;
-            document.getElementById('pf').innerText = d.metrics.profit_factor;
-            document.getElementById('risk').innerText = d.metrics.open_risk;
-            new Chart(document.getElementById('c1'), { type:'bar', data:{ labels:d.charts.monthly.labels, datasets:[{ data:d.charts.monthly.values.map(v=>parse(v)), backgroundColor:d.charts.monthly.values.map(v=>v.includes('(')?'#fca5a5':'#6ee7b7') }] }, options:{plugins:{legend:{display:false}}} });
-            new Chart(document.getElementById('c2'), { type:'doughnut', data:{ labels:d.charts.segment.labels.filter(l=>l), datasets:[{ data:d.charts.segment.values.filter(v=>v!=='₹0.00').map(v=>Math.abs(parse(v))), backgroundColor:['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f59e0b','#10b981'] }] } });
+        
+        function parseValue(v) {
+            return parseFloat(v.replace(/[₹,()]/g, '')) * (v.includes('(') ? -1 : 1);
         }
-        start();
+        
+        async function loadData() {
+            try {
+                const response = await fetch('data.json');
+                const data = await response.json();
+                
+                // Update metrics
+                document.getElementById('pnl').innerText = data.metrics.net_pnl;
+                document.getElementById('win').innerText = data.metrics.win_rate;
+                document.getElementById('pf').innerText = data.metrics.profit_factor;
+                document.getElementById('risk').innerText = data.metrics.open_risk;
+                
+                // Monthly Chart
+                new Chart(document.getElementById('monthlyChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.charts.monthly.labels,
+                        datasets: [{
+                            label: 'P&L',
+                            data: data.charts.monthly.values.map(v => parseValue(v)),
+                            backgroundColor: data.charts.monthly.values.map(v => 
+                                v.includes('(') ? '#ef4444' : '#10b981'
+                            ),
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+                
+                // Segment Chart
+                const validSegments = data.charts.segment.labels
+                    .map((label, i) => ({ label, value: data.charts.segment.values[i] }))
+                    .filter(s => s.label && s.value !== '₹0.00');
+                
+                new Chart(document.getElementById('segmentChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: validSegments.map(s => s.label),
+                        datasets: [{
+                            data: validSegments.map(s => Math.abs(parseValue(s.value))),
+                            backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        }
+        
+        loadData();
     </script>
 </body>
 </html>
