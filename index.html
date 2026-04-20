@@ -8,71 +8,43 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     //cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        .metric-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); border: 1px solid #f3f4f6; }
-        .sidebar-link { display: flex; align-items: center; padding: 12px 16px; border-radius: 8px; color: #4b5563; cursor: pointer; transition: 0.2s; }
-        .sidebar-link:hover { background: #f9fafb; }
+        .metric-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+        .sidebar-link { display: flex; align-items: center; padding: 12px 16px; border-radius: 8px; color: #4b5563; cursor: pointer; }
         .sidebar-link.active { background: #1f2937; color: white; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
     </style>
 </head>
 <body class="bg-gray-50 flex h-screen overflow-hidden">
-    <!-- Sidebar -->
     <aside class="w-64 bg-white border-r border-gray-200 flex flex-col p-6">
         <div class="mb-10">
-            <h1 class="text-2xl font-bold text-gray-900 tracking-tight">Trading Pro</h1>
-            <p class="text-xs text-gray-400 mt-1 uppercase font-semibold">Abhishek's Dashboard</p>
+            <h1 class="text-2xl font-bold text-gray-900">Trading Pro</h1>
+            <p class="text-xs text-gray-400 mt-1 uppercase">Abhishek's Dashboard</p>
         </div>
         <nav class="space-y-2">
             <div onclick="switchTab('overview')" id="nav-overview" class="sidebar-link active">
-                <i class="fas fa-chart-pie w-5 text-center"></i><span class="ml-3 font-medium">Overview</span>
+                <i class="fas fa-chart-pie w-5"></i><span class="ml-3 font-medium">Overview</span>
             </div>
             <div onclick="switchTab('risk')" id="nav-risk" class="sidebar-link">
-                <i class="fas fa-shield-halved w-5 text-center"></i><span class="ml-3 font-medium">Risk Analysis</span>
+                <i class="fas fa-shield-halved w-5"></i><span class="ml-3 font-medium">Risk Analysis</span>
             </div>
         </nav>
-        <div class="mt-auto pt-6 border-t border-gray-100 text-[10px] text-gray-400">
-            Auto-refresh daily at 8:00 AM IST
-        </div>
     </aside>
 
-    <!-- Main Content -->
     <main class="flex-1 overflow-y-auto p-10">
         <div id="overview" class="tab-content active">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-                <div class="metric-card">
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Net P&L (Closed)</div>
-                    <div id="net-pnl" class="text-3xl font-extrabold mt-2 text-emerald-600">₹0.00</div>
-                </div>
-                <div class="metric-card">
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Win Rate</div>
-                    <div id="win-rate" class="text-3xl font-extrabold mt-2 text-blue-600">0.0%</div>
-                </div>
-                <div class="metric-card">
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Profit Factor</div>
-                    <div id="profit-factor" class="text-3xl font-extrabold mt-2 text-indigo-600">0.00</div>
-                </div>
+                <div class="metric-card"><div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Net P&L</div><div id="net-pnl" class="text-3xl font-extrabold mt-2 text-emerald-600">₹0.00</div></div>
+                <div class="metric-card"><div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Win Rate</div><div id="win-rate" class="text-3xl font-extrabold mt-2 text-blue-600">0.0%</div></div>
+                <div class="metric-card"><div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Profit Factor</div><div id="profit-factor" class="text-3xl font-extrabold mt-2 text-indigo-600">0.00</div></div>
             </div>
-
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-bold mb-6 text-gray-800">Monthly Performance</h2>
-                    anvas id="monthlyChart" height="200"></canvas>
-                </div>
-                <div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-bold mb-6 text-gray-800">P&L by Segment</h2>
-                    anvas id="segmentChart" height="200"></canvas>
-                </div>
+                <div class="bg-white p-8 rounded-2xl shadow-sm"><h2 class="font-bold mb-6">Monthly Performance</h2>anvas id="monthlyChart"></canvas></div>
+                <div class="bg-white p-8 rounded-2xl shadow-sm"><h2 class="font-bold mb-6">P&L by Segment</h2>anvas id="segmentChart"></canvas></div>
             </div>
         </div>
-
         <div id="risk" class="tab-content">
-            <div class="max-w-md">
-                <div class="metric-card border-l-4 border-red-500">
-                    <div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Open Risk</div>
-                    <div id="open-risk" class="text-3xl font-extrabold mt-2 text-red-600">₹0.00</div>
-                </div>
-            </div>
+            <div class="metric-card border-l-4 border-red-500"><div class="text-xs font-bold text-gray-400 uppercase tracking-widest">Total Open Risk</div><div id="open-risk" class="text-3xl font-extrabold mt-2 text-red-600">₹0.00</div></div>
         </div>
     </main>
 
@@ -84,44 +56,40 @@
             document.getElementById('nav-' + id).classList.add('active');
         }
 
+        function cleanNum(v) { return parseFloat(v.replace(/[₹,()]/g, '')) * (v.includes('(') ? -1 : 1); }
+
         async function loadData() {
             try {
                 const res = await fetch('data.json');
                 const d = await res.json();
-                
                 document.getElementById('net-pnl').innerText = d.metrics.net_pnl;
                 document.getElementById('win-rate').innerText = d.metrics.win_rate;
                 document.getElementById('profit-factor').innerText = d.metrics.profit_factor;
                 document.getElementById('open-risk').innerText = d.metrics.open_risk;
 
-                // Monthly Chart
                 new Chart(document.getElementById('monthlyChart'), {
                     type: 'bar',
                     data: {
                         labels: d.charts.monthly.labels,
                         datasets: [{
-                            data: d.charts.monthly.values.map(v => parseFloat(v.replace(/[₹,()]/g, '')) * (v.includes('(') ? -1 : 1)),
-                            backgroundColor: d.charts.monthly.values.map(v => v.includes('(') ? '#fca5a5' : '#6ee7b7'),
-                            borderRadius: 4
+                            data: d.charts.monthly.values.map(v => cleanNum(v)),
+                            backgroundColor: d.charts.monthly.values.map(v => v.includes('(') ? '#fca5a5' : '#6ee7b7')
                         }]
                     },
-                    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
+                    options: { plugins: { legend: { display: false } } }
                 });
 
-                // Segment Chart
                 new Chart(document.getElementById('segmentChart'), {
                     type: 'doughnut',
                     data: {
                         labels: d.charts.segment.labels.filter(l => l),
                         datasets: [{
-                            data: d.charts.segment.values.filter(v => v !== '₹0.00').map(v => Math.abs(parseFloat(v.replace(/[₹,()]/g, '')))),
-                            backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981'],
-                            borderWidth: 0
+                            data: d.charts.segment.values.filter(v => v !== '₹0.00').map(v => Math.abs(cleanNum(v))),
+                            backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981']
                         }]
-                    },
-                    options: { cutout: '70%' }
+                    }
                 });
-            } catch (e) { console.error("Waiting for data sync..."); }
+            } catch (e) { console.error("Waiting for data..."); }
         }
         loadData();
     </script>
