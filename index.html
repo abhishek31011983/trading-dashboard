@@ -1,130 +1,29 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trading Dashboard - Abhishek</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    //cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .metric-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); transition: transform 0.2s; }
-        .metric-card:hover { transform: translateY(-2px); }
-        .sidebar-link { display: flex; align-items: center; padding: 12px 16px; border-radius: 8px; color: #4b5563; transition: all 0.2s; cursor: pointer; }
-        .sidebar-link:hover { background: #f3f4f6; color: #1f2937; }
-        .sidebar-link.active { background: #1f2937; color: white; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-    </style>
-</head>
-<body class="bg-gray-50 flex h-screen">
-    <!-- Sidebar -->
-    <aside class="w-64 bg-white border-r border-gray-200 flex flex-col p-4">
-        <div class="mb-8 px-4">
-            <h1 class="text-xl font-bold text-gray-800">Trading Pro</h1>
-            <p class="text-xs text-gray-400">Abhishek's Dashboard</p>
-        </div>
-        <nav class="space-y-1">
-            <div onclick="switchTab('overview')" id="nav-overview" class="sidebar-link active">
-                <i class="fas fa-chart-line w-5"></i><span class="ml-3">Overview</span>
-            </div>
-            <div onclick="switchTab('risk')" id="nav-risk" class="sidebar-link">
-                <i class="fas fa-shield-alt w-5"></i><span class="ml-3">Risk Analysis</span>
-            </div>
-            <div onclick="switchTab('trades')" id="nav-trades" class="sidebar-link">
-                <i class="fas fa-list w-5"></i><span class="ml-3">Trade History</span>
-            </div>
-        </nav>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="flex-1 overflow-y-auto p-8">
-        <!-- Overview Tab -->
-        <div id="overview" class="tab-content active">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div class="metric-card">
-                    <div class="text-sm font-medium text-gray-500 uppercase tracking-wider">Net P&L (Closed)</div>
-                    <div id="net-pnl" class="text-2xl font-bold mt-2 text-emerald-600">₹0.00</div>
-                </div>
-                <div class="metric-card">
-                    <div class="text-sm font-medium text-gray-500 uppercase tracking-wider">Win Rate</div>
-                    <div id="win-rate" class="text-2xl font-bold mt-2 text-blue-600">0.0%</div>
-                </div>
-                <div class="metric-card">
-                    <div class="text-sm font-medium text-gray-500 uppercase tracking-wider">Profit Factor</div>
-                    <div id="profit-factor" class="text-2xl font-bold mt-2 text-indigo-600">0.00</div>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-bold mb-6 text-gray-800">Monthly Closed P&L</h2>
-                    anvas id="monthlyChart" height="250"></canvas>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                    <h2 class="text-lg font-bold mb-6 text-gray-800">P&L by Segment</h2>
-                    anvas id="segmentChart" height="250"></canvas>
-                </div>
-            </div>
-        </div>
-
-        <!-- Risk Tab -->
-        <div id="risk" class="tab-content">
-            <h2 class="text-2xl font-bold mb-6">Risk Profile</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="metric-card">
-                    <div class="text-sm font-medium text-gray-500 uppercase tracking-wider">Expectancy</div>
-                    <div id="expectancy" class="text-2xl font-bold mt-2 text-emerald-600">₹0.00</div>
-                </div>
-                <div class="metric-card border-l-4 border-red-500">
-                    <div class="text-sm font-medium text-gray-500 uppercase tracking-wider">Total Open Risk</div>
-                    <div id="open-risk" class="text-2xl font-bold mt-2 text-red-600">₹0.00</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Trades Tab -->
-        <div id="trades" class="tab-content">
-            <h2 class="text-2xl font-bold mb-6">Recent Trades</h2>
-            <div class="metric-card">
-                <p class="text-gray-500 italic">Trade details are being synced from Google Sheets...</p>
-            </div>
-        </div>
-    </main>
-
-    <script>
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.sidebar-link').forEach(link => link.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.getElementById('nav-' + tabId).classList.add('active');
-        }
-
-        async function loadData() {
-            try {
-                const response = await fetch('data.json');
-                const data = await response.json();
-                
-                // Update text metrics
-                document.getElementById('net-pnl').innerText = data.metrics.net_pnl;
-                document.getElementById('win-rate').innerText = data.metrics.win_rate;
-                document.getElementById('profit-factor').innerText = data.metrics.profit_factor;
-                document.getElementById('expectancy').innerText = data.metrics.expectancy;
-                document.getElementById('open-risk').innerText = data.metrics.open_risk;
-
-                // Load Charts (Example structure)
-                initCharts(data);
-            } catch (e) {
-                console.log("Syncing initial data...");
-            }
-        }
-
         function initCharts(data) {
-            // Logic for charts will be added here in the next step to keep code manageable
-            console.log("Data synced successfully");
-        }
+            // 1. Monthly Performance Chart
+            new Chart(document.getElementById('monthlyChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.charts.monthly.labels,
+                    datasets: [{
+                        label: 'Monthly Closed P&L',
+                        data: data.charts.monthly.values.map(v => parseFloat(v.replace(/[₹,()]/g, '')) * (v.includes('(') ? -1 : 1)),
+                        backgroundColor: data.charts.monthly.values.map(v => v.includes('(') ? '#ef4444' : '#10b981'),
+                        borderRadius: 6
+                    }]
+                },
+                options: { responsive: true, plugins: { legend: { display: false } } }
+            });
 
-        loadData();
-    </script>
-</body>
-</html>
+            // 2. Segment Performance Chart
+            new Chart(document.getElementById('segmentChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: data.charts.segment.labels.filter(l => l),
+                    datasets: [{
+                        data: data.charts.segment.values.filter(v => v !== '₹0.00').map(v => Math.abs(parseFloat(v.replace(/[₹,()]/g, '')))),
+                        backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981', '#06b6d4']
+                    }]
+                },
+                options: { responsive: true }
+            });
+        }
