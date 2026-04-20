@@ -6,57 +6,53 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        .metric { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .side-btn { width: 100%; text-align: left; padding: 12px; border-radius: 8px; margin-bottom: 4px; cursor: pointer; }
-        .side-btn:hover { background: #f3f4f6; }
-        .side-btn.active { background: #1f2937; color: white; }
-        .tab { display: none; }
-        .tab.active { display: block; }
+        .metric { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .side-btn { width: 100%; text-align: left; padding: 10px; border-radius: 6px; cursor: pointer; margin-bottom: 5px; }
+        .active { background: #1f2937 !important; color: white !important; }
+        .tab { display: none; } .tab-active { display: block; }
     </style>
 </head>
-<body class="bg-gray-100 flex h-screen overflow-hidden font-sans">
-    <div class="w-64 bg-white border-r p-6">
-        <h1 class="text-xl font-bold mb-8">Trading Pro</h1>
-        <div onclick="show('ov')" id="b-ov" class="side-btn active">Overview</div>
-        <div onclick="show('rk')" id="b-rk" class="side-btn">Risk</div>
+<body class="bg-gray-100 flex font-sans">
+    <div class="w-56 h-screen bg-white border-r p-5">
+        <h1 class="font-bold text-xl mb-10">Trading Pro</h1>
+        <div onclick="tab('ov')" id="b-ov" class="side-btn active">Overview</div>
+        <div onclick="tab('rk')" id="b-rk" class="side-btn">Risk Analysis</div>
     </div>
-    <div class="flex-1 p-10 overflow-y-auto">
-        <div id="ov" class="tab active">
-            <div class="grid grid-cols-3 gap-6 mb-10">
-                <div class="metric"><p class="text-xs text-gray-500 uppercase">Net P&L</p><h2 id="pnl" class="text-2xl font-bold text-green-600">₹0</h2></div>
-                <div class="metric"><p class="text-xs text-gray-500 uppercase">Win Rate</p><h2 id="win" class="text-2xl font-bold text-blue-600">0%</h2></div>
-                <div class="metric"><p class="text-xs text-gray-500 uppercase">Profit Factor</p><h2 id="pf" class="text-2xl font-bold text-indigo-600">0</h2></div>
+    <div class="flex-1 p-10 overflow-auto">
+        <div id="ov" class="tab tab-active">
+            <div class="grid grid-cols-3 gap-5 mb-10">
+                <div class="metric"><p class="text-xs text-gray-400 uppercase font-bold">Net P&L</p><h2 id="pnl" class="text-2xl font-bold text-green-600">₹0</h2></div>
+                <div class="metric"><p class="text-xs text-gray-400 uppercase font-bold">Win Rate</p><h2 id="win" class="text-2xl font-bold text-blue-600">0%</h2></div>
+                <div class="metric"><p class="text-xs text-gray-400 uppercase font-bold">Profit Factor</p><h2 id="pf" class="text-2xl font-bold text-purple-600">0</h2></div>
             </div>
-            <div class="grid grid-cols-2 gap-10">
-                <div class="bg-white p-6 rounded-xl shadow-sm"><h3 class="font-bold mb-4">Monthly</h3>anvas id="c1"></canvas></div>
-                <div class="bg-white p-6 rounded-xl shadow-sm"><h3 class="font-bold mb-4">Segments</h3>anvas id="c2"></canvas></div>
+            <div class="grid grid-cols-2 gap-5">
+                <div class="bg-white p-5 rounded shadow"><b>Monthly</b>anvas id="c1"></canvas></div>
+                <div class="bg-white p-5 rounded shadow"><b>Segments</b>anvas id="c2"></canvas></div>
             </div>
         </div>
         <div id="rk" class="tab">
-            <div class="metric border-l-4 border-red-500"><p class="text-xs text-gray-500 uppercase">Total Open Risk</p><h2 id="risk" class="text-2xl font-bold text-red-600">₹0</h2></div>
+            <div class="metric border-l-4 border-red-500"><p class="text-xs text-gray-400 uppercase font-bold">Open Risk</p><h2 id="risk" class="text-2xl font-bold text-red-600">₹0</h2></div>
         </div>
     </div>
     <script>
-        function show(id) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        function tab(id) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
             document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(id).classList.add('active');
+            document.getElementById(id).classList.add('tab-active');
             document.getElementById('b-'+id).classList.add('active');
         }
-        function n(v) { return parseFloat(v.replace(/[₹,()]/g, '')) * (v.includes('(')?-1:1); }
-        async function run() {
-            try {
-                const r = await fetch('data.json');
-                const d = await r.json();
-                document.getElementById('pnl').innerText = d.metrics.net_pnl;
-                document.getElementById('win').innerText = d.metrics.win_rate;
-                document.getElementById('pf').innerText = d.metrics.profit_factor;
-                document.getElementById('risk').innerText = d.metrics.open_risk;
-                new Chart(document.getElementById('c1'), { type: 'bar', data: { labels: d.charts.monthly.labels, datasets: [{ data: d.charts.monthly.values.map(v => n(v)), backgroundColor: d.charts.monthly.values.map(v => v.includes('(')?'#fca5a5':'#6ee7b7') }] }, options: { plugins: { legend: { display: false } } } });
-                new Chart(document.getElementById('c2'), { type: 'doughnut', data: { labels: d.charts.segment.labels.filter(l => l), datasets: [{ data: d.charts.segment.values.filter(v => v !== '₹0.00').map(v => Math.abs(n(v))), backgroundColor: ['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f59e0b','#10b981'] }] } });
-            } catch(e) { console.log('Waiting...'); }
+        function parse(v) { return parseFloat(v.replace(/[₹,()]/g, '')) * (v.includes('(')?-1:1); }
+        async function start() {
+            const r = await fetch('data.json');
+            const d = await r.json();
+            document.getElementById('pnl').innerText = d.metrics.net_pnl;
+            document.getElementById('win').innerText = d.metrics.win_rate;
+            document.getElementById('pf').innerText = d.metrics.profit_factor;
+            document.getElementById('risk').innerText = d.metrics.open_risk;
+            new Chart(document.getElementById('c1'), { type:'bar', data:{ labels:d.charts.monthly.labels, datasets:[{ data:d.charts.monthly.values.map(v=>parse(v)), backgroundColor:d.charts.monthly.values.map(v=>v.includes('(')?'#fca5a5':'#6ee7b7') }] }, options:{plugins:{legend:{display:false}}} });
+            new Chart(document.getElementById('c2'), { type:'doughnut', data:{ labels:d.charts.segment.labels.filter(l=>l), datasets:[{ data:d.charts.segment.values.filter(v=>v!=='₹0.00').map(v=>Math.abs(parse(v))), backgroundColor:['#6366f1','#8b5cf6','#ec4899','#f43f5e','#f59e0b','#10b981'] }] } });
         }
-        run();
+        start();
     </script>
 </body>
 </html>
