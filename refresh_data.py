@@ -11,19 +11,33 @@ creds = Credentials.from_service_account_info(creds_dict, scopes=SCOPES)
 client = gspread.authorize(creds)
 
 # 2. Open your Sheet
-# Using the ID from your browser: 1hqg0c7PGiEaxC-PpOuyCSfivwyhPKgS0mpbNIa55Zio
 sheet = client.open_by_key('1hqg0c7PGiEaxC-PpOuyCSfivwyhPKgS0mpbNIa55Zio')
 dash_tab = sheet.worksheet("dashboard")
 
-# 3. Fetch Metrics (Adjust cell coordinates if you change the sheet layout)
+# 3. Fetch Data
+# Main Metrics
+metrics = {
+    "net_pnl": dash_tab.acell('B6').value,
+    "win_rate": dash_tab.acell('D6').value,
+    "profit_factor": dash_tab.acell('F6').value,
+    "total_trades": dash_tab.acell('B9').value,
+    "expectancy": dash_tab.acell('B12').value,
+    "open_risk": dash_tab.acell('H12').value
+}
+
+# Monthly Data (Rows 15-26, Columns B & C)
+monthly_labels = dash_tab.col_values(2)[14:26] # Column B (Month)
+monthly_values = dash_tab.col_values(3)[14:26] # Column C (Closed P&L)
+
+# Segment Data (Rows 15-21, Columns G & H)
+segment_labels = dash_tab.col_values(7)[14:21] # Column G (Segment)
+segment_values = dash_tab.col_values(8)[14:21] # Column H (P&L)
+
 data = {
-    "metrics": {
-        "net_pnl": dash_tab.acell('B6').value,
-        "win_rate": dash_tab.acell('D6').value,
-        "profit_factor": dash_tab.acell('F6').value,
-        "total_trades": dash_tab.acell('B9').value,
-        "expectancy": dash_tab.acell('B12').value,
-        "open_risk": dash_tab.acell('H12').value  # Based on your Google Sheet structure
+    "metrics": metrics,
+    "charts": {
+        "monthly": {"labels": monthly_labels, "values": monthly_values},
+        "segment": {"labels": segment_labels, "values": segment_values}
     }
 }
 
