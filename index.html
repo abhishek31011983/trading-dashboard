@@ -5,6 +5,9 @@
     <title>Trading Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <style>
         body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; }
         .metric-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
@@ -16,6 +19,9 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
         .chart-container { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: 320px; }
+        .table-container { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        table.dataTable { font-size: 0.875rem; }
+        table.dataTable thead th { background: #f8fafc; font-weight: 600; }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -24,15 +30,29 @@
         <div class="w-64 bg-white border-r border-gray-200 p-6">
             <h1 class="text-2xl font-bold text-gray-900 mb-8">Trading Pro</h1>
             <nav>
-                <button onclick="switchTab('overview')" id="btn-overview" class="side-btn active">📊 Overview</button>
+                <button onclick="switchTab('journal')" id="btn-journal" class="side-btn active">📊 Live Journal</button>
+                <button onclick="switchTab('overview')" id="btn-overview" class="side-btn">📈 Overview</button>
                 <button onclick="switchTab('risk')" id="btn-risk" class="side-btn">⚠️ Risk Analysis</button>
             </nav>
         </div>
         
         <!-- Main Content -->
         <div class="flex-1 p-8">
+            <!-- Live Journal Tab -->
+            <div id="journal" class="tab-content active">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8">Live Trading Journal</h2>
+                <div class="table-container">
+                    <table id="tradesTable" class="display" style="width:100%">
+                        <thead>
+                            <tr id="tableHeaders"></tr>
+                        </thead>
+                        <tbody id="tableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
             <!-- Overview Tab -->
-            <div id="overview" class="tab-content active">
+            <div id="overview" class="tab-content">
                 <h2 class="text-3xl font-bold text-gray-900 mb-8">Performance Overview</h2>
                 
                 <!-- Metrics Grid -->
@@ -104,6 +124,28 @@
                 document.getElementById('win').innerText = data.metrics.win_rate;
                 document.getElementById('pf').innerText = data.metrics.profit_factor;
                 document.getElementById('risk').innerText = data.metrics.open_risk;
+                
+                // Load journal table
+                if (data.trades && data.trades.length > 0) {
+                    const headers = data.headers || Object.keys(data.trades[0]);
+                    const headerRow = document.getElementById('tableHeaders');
+                    headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+                    
+                    const tbody = document.getElementById('tableBody');
+                    tbody.innerHTML = data.trades.map(trade => {
+                        return '<tr>' + headers.map(h => {
+                            const key = h.toLowerCase().replace(/[^a-z0-9]/g, '_');
+                            return `<td>${trade[key] || ''}</td>`;
+                        }).join('') + '</tr>';
+                    }).join('');
+                    
+                    // Initialize DataTable
+                    $('#tradesTable').DataTable({
+                        pageLength: 25,
+                        order: [[1, 'desc']], // Sort by date
+                        responsive: true
+                    });
+                }
                 
                 // Monthly Chart
                 new Chart(document.getElementById('monthlyChart'), {
