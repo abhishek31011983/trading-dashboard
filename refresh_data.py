@@ -13,7 +13,7 @@ client = gspread.authorize(creds)
 # 2. Open your Sheet
 sheet = client.open_by_key('1hqg0c7PGiEaxC-PpOuyCSfivwyhPKgS0mpbNIa55Zio')
 dash_tab = sheet.worksheet("dashboard")
-cash_tab = sheet.worksheet("Cash")
+cash_tab = sheet.worksheet("All Trades")
 
 # 3. Fetch Data
 # Main Metrics
