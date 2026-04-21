@@ -52,6 +52,7 @@
       transition: all 0.2s;
       background: transparent;
       color: #475569;
+      border: none;
     }
     .side-btn:hover {
       background: #f1f5f9;
@@ -85,12 +86,6 @@
     table.dataTable thead th {
       background: #f8fafc;
       font-weight: 600;
-    }
-    .dtsp-searchPanes {
-      margin-bottom: 20px;
-    }
-    .dtsp-searchPane {
-      border-radius: 8px;
     }
     table.dataTable tbody tr {
       height: 60px !important;
@@ -143,7 +138,7 @@
         <h2 class="text-3xl font-bold text-gray-900 mb-8">Performance Overview</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div class="metric-card">
-            <div class="metric-label">Net P&amp;L</div>
+            <div class="metric-label">Net P&L</div>
             <div class="metric-value" id="pnl">₹0</div>
           </div>
           <div class="metric-card">
@@ -189,7 +184,7 @@
           <h3 class="text-2xl font-bold text-gray-700 mb-4">Cash Trades</h3>
           <table id="cashRiskTable" class="display" style="width:100%"></table>
 
-          <h3 class="text-2xl font-bold text-gray-700 mb-4 mt-8">Futures &amp; Options</h3>
+          <h3 class="text-2xl font-bold text-gray-700 mb-4 mt-8">Futures & Options</h3>
           <table id="futuresRiskTable" class="display" style="width:100%"></table>
         </div>
       </div>
@@ -267,6 +262,8 @@
           ? data.headers
           : (trades.length ? Object.keys(trades[0]) : []);
 
+        destroyDataTableIfExists('#tradesTable');
+
         if (trades.length > 0 && headers.length > 0) {
           const headerRow = document.getElementById('tableHeaders');
           headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
@@ -278,8 +275,6 @@
               return `<td>${safeCell(trade[key])}</td>`;
             }).join('') + '</tr>';
           }).join('');
-
-          destroyDataTableIfExists('#tradesTable');
 
           $('#tradesTable').DataTable({
             pageLength: 25,
