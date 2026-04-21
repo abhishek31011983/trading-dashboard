@@ -203,6 +203,43 @@
                         plugins: { legend: { position: 'bottom' } }
                     }
                 });
+
+                      // Load Open Risk tables
+      const openTrades = data.trades.filter(t => t.status === 'Open');
+      const cashTrades = openTrades.filter(t => t.instrument === 'Cash');
+      const futuresTrades = openTrades.filter(t => t.instrument === 'Futures');
+      
+      if (cashTrades.length > 0) {
+        $('#cashRiskTable').DataTable({
+          data: cashTrades,
+          columns: [
+            { data: 'name', title: 'Stock' },
+            { data: 'entry_price', title: 'Entry Price' },
+            { data: 'current_price', title: 'Current Price' },
+            { data: 'shares', title: 'Shares' },
+            { data: 'tsl', title: 'TSL' },
+            { data: 'total_open_risk', title: 'Open Risk' }
+          ],
+          paging: false,
+          searching: false
+        });
+      }
+      
+      if (futuresTrades.length > 0) {
+        $('#futuresRiskTable').DataTable({
+          data: futuresTrades,
+          columns: [
+            { data: 'name', title: 'Symbol' },
+            { data: 'entry_price', title: 'Entry Price' },
+            { data: 'current_price', title: 'Current Price' },
+            { data: 'shares', title: 'Quantity' },
+            { data: 'tsl', title: 'TSL' },
+            { data: 'total_open_risk', title: 'Open Risk' }
+          ],
+          paging: false,
+          searching: false
+        });
+      }
             } catch (error) {
                 console.error('Error loading data:', error);
             }
