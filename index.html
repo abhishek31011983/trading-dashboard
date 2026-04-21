@@ -1,235 +1,404 @@
 <!DOCTYPE html>
-<!-- v2.0 - Cache busting update -->
-<html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Trading Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/searchpanes/2.2.0/css/searchPanes.dataTables.min.css">
-    <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/searchpanes/2.2.0/js/dataTables.searchPanes.min.js"></script>
-    <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
-    <style>
-        body { font-family: system-ui, -apple-system, sans-serif; background: #f8fafc; }
-        .metric-card { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .metric-value { font-size: 2rem; font-weight: 700; color: #1e293b; margin-top: 8px; }
-        .metric-label { font-size: 0.875rem; font-weight: 500; color: #64748b; text-transform: uppercase; letter-spacing: 0.025em; }
-        .side-btn { width: 100%; text-align: left; padding: 12px 16px; border-radius: 8px; cursor: pointer; margin-bottom: 6px; font-weight: 500; transition: all 0.2s; background: transparent; color: #475569; }
-        .side-btn:hover { background: #f1f5f9; }
-        .side-btn.active { background: #3b82f6; color: white; }
-        .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        .chart-container { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); height: 320px; }
-        .table-container { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        table.dataTable { font-size: 0.875rem; }
-        table.dataTable thead th { background: #f8fafc; font-weight: 600; }
-        .dtsp-searchPanes { margin-bottom: 20px; }
-        .dtsp-searchPane { border-radius: 8px; }
-            table.dataTable tbody tr { height: 60px !important; }
-            table.dataTable tbody td { padding: 12px !important; vertical-align: middle !important; white-space: normal; word-wrap: break-word; max-width: 200px; }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Trading Dashboard</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <link rel="stylesheet" href="https://cdn.datatables.net/1.13.7/css/jquery.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/searchpanes/2.2.0/css/searchPanes.dataTables.min.css">
+  <link rel="stylesheet" href="https://cdn.datatables.net/select/1.7.0/css/select.dataTables.min.css">
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+  <script src="https://cdn.datatables.net/searchpanes/2.2.0/js/dataTables.searchPanes.min.js"></script>
+  <script src="https://cdn.datatables.net/select/1.7.0/js/dataTables.select.min.js"></script>
+
+  <style>
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f8fafc;
+    }
+    .metric-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .metric-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #1e293b;
+      margin-top: 8px;
+    }
+    .metric-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #64748b;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+    .side-btn {
+      width: 100%;
+      text-align: left;
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 6px;
+      font-weight: 500;
+      transition: all 0.2s;
+      background: transparent;
+      color: #475569;
+    }
+    .side-btn:hover {
+      background: #f1f5f9;
+    }
+    .side-btn.active {
+      background: #3b82f6;
+      color: white;
+    }
+    .tab-content {
+      display: none;
+    }
+    .tab-content.active {
+      display: block;
+    }
+    .chart-container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      height: 320px;
+    }
+    .table-container {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    table.dataTable {
+      font-size: 0.875rem;
+    }
+    table.dataTable thead th {
+      background: #f8fafc;
+      font-weight: 600;
+    }
+    .dtsp-searchPanes {
+      margin-bottom: 20px;
+    }
+    .dtsp-searchPane {
+      border-radius: 8px;
+    }
+    table.dataTable tbody tr {
+      height: 60px !important;
+    }
+    table.dataTable tbody td {
+      padding: 12px !important;
+      vertical-align: middle !important;
+      white-space: normal;
+      word-wrap: break-word;
+      max-width: 200px;
+    }
+    .error-box {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      display: none;
+    }
+  </style>
 </head>
 <body class="bg-gray-50">
-    <div class="min-h-screen flex">
-        <div class="w-64 bg-white border-r border-gray-200 p-6">
-            <h1 class="text-2xl font-bold text-gray-900 mb-8">Trading Pro</h1>
-            <nav>
-                <button onclick="switchTab('journal')" id="btn-journal" class="side-btn active">📊 Live Journal</button>
-                <button onclick="switchTab('overview')" id="btn-overview" class="side-btn">📈 Overview</button>
-                <button onclick="switchTab('risk')" id="btn-risk" class="side-btn">⚠️ Risk Analysis</button>
-                    <button onclick="switchTab('openrisk')" id="btn-openrisk" class="side-btn">💰 Open Risk</button>
-            </nav>
-        </div>
-        
-        <div class="flex-1 p-8">
-            <div id="journal" class="tab-content active">
-                <h2 class="text-3xl font-bold text-gray-900 mb-8">Live Trading Journal</h2>
-                <div class="table-container">
-                    <table id="tradesTable" class="display" style="width:100%">
-                        <thead>
-                            <tr id="tableHeaders"></tr>
-                        </thead>
-                        <tbody id="tableBody"></tbody>
-                    </table>
-                </div>
-            </div>
-            
-            <div id="overview" class="tab-content">
-                <h2 class="text-3xl font-bold text-gray-900 mb-8">Performance Overview</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                    <div class="metric-card">
-                        <div class="metric-label">Net P&L</div>
-                        <div class="metric-value" id="pnl">₹0</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Win Rate</div>
-                        <div class="metric-value" id="win">0%</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Profit Factor</div>
-                        <div class="metric-value" id="pf">0</div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="chart-container">
-                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Monthly Performance</h3>
-                        <canvas id="monthlyChart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Segment Breakdown</h3>
-                        <canvas id="segmentChart"></canvas>
-                    </div>
-                </div>
-            </div>
-            
-            <div id="risk" class="tab-content">
-                <h2 class="text-3xl font-bold text-gray-900 mb-8">Risk Analysis</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="metric-card">
-                        <div class="metric-label">Open Risk</div>
-                        <div class="metric-value" id="risk">₹0</div>
-                    </div>
-                    <div class="metric-card">
-                        <div class="metric-label">Max Drawdown</div>
-                        <div class="metric-value">Coming Soon</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Open Risk Tab -->
-            <div id="openrisk" class="tab-content">
-                <h2 class="text-3xl font-bold text-gray-900 mb-8">Open Risk Analysis</h2>
-                
-<div class="table-container">
-                            <h3 class="text-2xl font-bold text-gray-700 mb-4">Cash Trades</h3>
-                <table id="cashRiskTable" class="display" style="width:100%"></table>
-                
-                <h3 class="text-2xl font-bold text-gray-700 mb-4 mt-8">Futures & Options</h3>
-                <table id="futuresRiskTable" class="display" style="width:100%"></table>
-            </div>
-        </div>
+  <div class="min-h-screen flex">
+    <div class="w-64 bg-white border-r border-gray-200 p-6">
+      <h1 class="text-2xl font-bold text-gray-900 mb-8">Trading Pro</h1>
+      <nav>
+        <button onclick="switchTab('journal')" id="btn-journal" class="side-btn active">📊 Live Journal</button>
+        <button onclick="switchTab('overview')" id="btn-overview" class="side-btn">📈 Overview</button>
+        <button onclick="switchTab('risk')" id="btn-risk" class="side-btn">⚠️ Risk Analysis</button>
+        <button onclick="switchTab('openrisk')" id="btn-openrisk" class="side-btn">💰 Open Risk</button>
+      </nav>
     </div>
-    
-    <script>
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(tabName).classList.add('active');
-            document.getElementById('btn-' + tabName).classList.add('active');
-        }
-        
-        function parseValue(v) {
-            return parseFloat(v.replace(/[₹,()]/g, '')) * (v.includes('(') ? -1 : 1);
-        }
-        
-        async function loadData() {
-            try {
-                const response = await fetch('data.json');
-                const data = await response.json();
-                
-                document.getElementById('pnl').innerText = data.metrics.net_pnl;
-                document.getElementById('win').innerText = data.metrics.win_rate;
-                document.getElementById('pf').innerText = data.metrics.profit_factor;
-                document.getElementById('risk').innerText = data.metrics.open_risk;
-                
-                if (data.trades && data.trades.length > 0) {
-                    const headers = data.headers || Object.keys(data.trades[0]);
-                    const headerRow = document.getElementById('tableHeaders');
-                    headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
-                    
-                    const tbody = document.getElementById('tableBody');
-                    tbody.innerHTML = data.trades.map(trade => {
-                        return '<tr>' + headers.map(h => {
-                            const key = h.toLowerCase().replace(/[^a-z0-9]/g, '_');
-                            return `<td>${trade[key] || ''}</td>`;
-                        }).join('') + '</tr>';
-                    }).join('');
-                    
-                    $('#tradesTable').DataTable({
-                        pageLength: 25,
-                        order: [[1, 'desc']],
-                        dom: 'Pfrtip',
-                        searchPanes: {
-                            cascadePanes: true,
-                            viewTotal: true,
-                            columns: [0, 4, 5, 6]
-                        },
-                        columnDefs: [
-                            { searchPanes: { show: true }, targets: [0, 4, 5, 6] }
-                        ]
-                    });
-                }
-                
-                new Chart(document.getElementById('monthlyChart'), {
-                    type: 'bar',
-                    data: {
-                        labels: data.charts.monthly.labels,
-                        datasets: [{
-                            label: 'P&L',
-                            data: data.charts.monthly.values.map(v => parseValue(v)),
-                            backgroundColor: data.charts.monthly.values.map(v => 
-                                v.includes('(') ? '#ef4444' : '#10b981'
-                            ),
-                            borderRadius: 6
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { display: false } },
-                        scales: { y: { beginAtZero: true } }
-                    }
-                });
-                
-                const validSegments = data.charts.segment.labels
-                    .map((label, i) => ({ label, value: data.charts.segment.values[i] }))
-                    .filter(s => s.label && s.value !== '₹0.00');
-                
-                new Chart(document.getElementById('segmentChart'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: validSegments.map(s => s.label),
-                        datasets: [{
-                            data: validSegments.map(s => Math.abs(parseValue(s.value))),
-                            backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981']
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: { legend: { position: 'bottom' } }
-                    }
-                });
 
-                      // Load Open Risk tables
-      const cashRiskData = data.open_risk.cash || [];
-      const derivativesRiskData = data.open_risk.derivatives || [];      
-      if (cashRiskData.length > 0) {        $('#cashRiskTable').DataTable({
+    <div class="flex-1 p-8">
+      <div id="errorBox" class="error-box"></div>
+
+      <div id="journal" class="tab-content active">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Live Trading Journal</h2>
+        <div class="table-container">
+          <table id="tradesTable" class="display" style="width:100%">
+            <thead>
+              <tr id="tableHeaders"></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div id="overview" class="tab-content">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Performance Overview</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div class="metric-card">
+            <div class="metric-label">Net P&amp;L</div>
+            <div class="metric-value" id="pnl">₹0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Win Rate</div>
+            <div class="metric-value" id="win">0%</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Profit Factor</div>
+            <div class="metric-value" id="pf">0</div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Monthly Performance</h3>
+            <canvas id="monthlyChart"></canvas>
+          </div>
+          <div class="chart-container">
+            <h3 class="text-lg font-semibold text-gray-700 mb-4">Segment Breakdown</h3>
+            <canvas id="segmentChart"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <div id="risk" class="tab-content">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Risk Analysis</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="metric-card">
+            <div class="metric-label">Open Risk</div>
+            <div class="metric-value" id="risk">₹0</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">Max Drawdown</div>
+            <div class="metric-value">Coming Soon</div>
+          </div>
+        </div>
+      </div>
+
+      <div id="openrisk" class="tab-content">
+        <h2 class="text-3xl font-bold text-gray-900 mb-8">Open Risk Analysis</h2>
+
+        <div class="table-container">
+          <h3 class="text-2xl font-bold text-gray-700 mb-4">Cash Trades</h3>
+          <table id="cashRiskTable" class="display" style="width:100%"></table>
+
+          <h3 class="text-2xl font-bold text-gray-700 mb-4 mt-8">Futures &amp; Options</h3>
+          <table id="futuresRiskTable" class="display" style="width:100%"></table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let monthlyChartInstance = null;
+    let segmentChartInstance = null;
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.side-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+      document.getElementById('btn-' + tabName).classList.add('active');
+    }
+
+    function showError(message) {
+      const box = document.getElementById('errorBox');
+      box.style.display = 'block';
+      box.textContent = message;
+    }
+
+    function clearError() {
+      const box = document.getElementById('errorBox');
+      box.style.display = 'none';
+      box.textContent = '';
+    }
+
+    function parseValue(v) {
+      if (v === null || v === undefined) return 0;
+      const str = String(v).trim();
+      if (!str) return 0;
+      const numeric = parseFloat(str.replace(/[₹,% ,]/g, '').replace(/[()]/g, ''));
+      if (isNaN(numeric)) return 0;
+      return str.includes('(') ? -numeric : numeric;
+    }
+
+    function safeCell(value) {
+      return value === null || value === undefined ? '' : value;
+    }
+
+    function normalizeKey(header) {
+      return header.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    }
+
+    function destroyDataTableIfExists(selector) {
+      if ($.fn.DataTable.isDataTable(selector)) {
+        $(selector).DataTable().destroy();
+      }
+      const el = document.querySelector(selector);
+      if (el && el.tagName === 'TABLE') {
+        el.innerHTML = '';
+      }
+    }
+
+    async function loadData() {
+      try {
+        clearError();
+
+        const response = await fetch(`data.json?v=${Date.now()}`, { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`Could not load data.json (${response.status})`);
+        }
+
+        const data = await response.json();
+
+        document.getElementById('pnl').innerText = safeCell(data?.metrics?.net_pnl || '₹0');
+        document.getElementById('win').innerText = safeCell(data?.metrics?.win_rate || '0%');
+        document.getElementById('pf').innerText = safeCell(data?.metrics?.profit_factor || '0');
+        document.getElementById('risk').innerText = safeCell(data?.metrics?.open_risk || '₹0');
+
+        const trades = Array.isArray(data?.trades) ? data.trades : [];
+        const headers = Array.isArray(data?.headers) && data.headers.length
+          ? data.headers
+          : (trades.length ? Object.keys(trades[0]) : []);
+
+        if (trades.length > 0 && headers.length > 0) {
+          const headerRow = document.getElementById('tableHeaders');
+          headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
+
+          const tbody = document.getElementById('tableBody');
+          tbody.innerHTML = trades.map(trade => {
+            return '<tr>' + headers.map(h => {
+              const key = normalizeKey(h);
+              return `<td>${safeCell(trade[key])}</td>`;
+            }).join('') + '</tr>';
+          }).join('');
+
+          destroyDataTableIfExists('#tradesTable');
+
+          $('#tradesTable').DataTable({
+            pageLength: 25,
+            order: [[1, 'desc']],
+            dom: 'Pfrtip',
+            searchPanes: {
+              cascadePanes: true,
+              viewTotal: true,
+              columns: [0, 4, 5, 6]
+            },
+            columnDefs: [
+              { searchPanes: { show: true }, targets: [0, 4, 5, 6] }
+            ]
+          });
+        }
+
+        const monthlyLabels = data?.charts?.monthly?.labels || [];
+        const monthlyValues = data?.charts?.monthly?.values || [];
+
+        if (monthlyChartInstance) {
+          monthlyChartInstance.destroy();
+        }
+
+        monthlyChartInstance = new Chart(document.getElementById('monthlyChart'), {
+          type: 'bar',
+          data: {
+            labels: monthlyLabels,
+            datasets: [{
+              label: 'P&L',
+              data: monthlyValues.map(v => parseValue(v)),
+              backgroundColor: monthlyValues.map(v =>
+                String(v).includes('(') ? '#ef4444' : '#10b981'
+              ),
+              borderRadius: 6
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+          }
+        });
+
+        const rawSegmentLabels = data?.charts?.segment?.labels || [];
+        const rawSegmentValues = data?.charts?.segment?.values || [];
+
+        let segmentLabels = rawSegmentLabels;
+        let segmentValues = rawSegmentValues;
+
+        const labelsLookNumeric = rawSegmentLabels.every(v => /^[-(₹0-9,.\s)%]+$/.test(String(v || '').trim()));
+        const valuesLookNumeric = rawSegmentValues.every(v => /^[-(₹0-9,.\s)%]+$/.test(String(v || '').trim()));
+
+        if (labelsLookNumeric && valuesLookNumeric) {
+          segmentLabels = rawSegmentLabels.map((_, i) => `Segment ${i + 1}`);
+          segmentValues = rawSegmentValues;
+        }
+
+        const validSegments = segmentLabels
+          .map((label, i) => ({ label, value: segmentValues[i] }))
+          .filter(s => String(s.label).trim() !== '' && parseValue(s.value) !== 0);
+
+        if (segmentChartInstance) {
+          segmentChartInstance.destroy();
+        }
+
+        segmentChartInstance = new Chart(document.getElementById('segmentChart'), {
+          type: 'doughnut',
+          data: {
+            labels: validSegments.map(s => s.label),
+            datasets: [{
+              data: validSegments.map(s => Math.abs(parseValue(s.value))),
+              backgroundColor: ['#3b82f6', '#8b5cf6', '#ec4899', '#f43f5e', '#f59e0b', '#10b981', '#14b8a6', '#6366f1']
+            }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+          }
+        });
+
+        const cashRiskData = Array.isArray(data?.open_risk?.cash) ? data.open_risk.cash : [];
+        const derivativesRiskData = Array.isArray(data?.open_risk?.derivatives) ? data.open_risk.derivatives : [];
+
+        destroyDataTableIfExists('#cashRiskTable');
+        destroyDataTableIfExists('#futuresRiskTable');
+
         $('#cashRiskTable').DataTable({
           data: cashRiskData,
           columns: [
-            { data: 'stock', title: 'Stock Name' },
-            { data: 'open_risk', title: 'Total Open Risk' }
+            { data: 'stock', title: 'Stock Name', defaultContent: '' },
+            { data: 'open_risk', title: 'Total Open Risk', defaultContent: '' }
           ],
+          paging: false,
+          searching: false,
+          info: false,
+          ordering: false
+        });
 
-
-                    if (derivativesRiskData.length > 0) {
         $('#futuresRiskTable').DataTable({
           data: derivativesRiskData,
           columns: [
-            { data: 'symbol', title: 'Symbol Name' },
-            { data: 'open_risk', title: 'Total Open Risk' }
+            { data: 'symbol', title: 'Symbol Name', defaultContent: '' },
+            { data: 'open_risk', title: 'Total Open Risk', defaultContent: '' }
           ],
           paging: false,
-          searching: false
+          searching: false,
+          info: false,
+          ordering: false
         });
+
+      } catch (error) {
+        console.error(error);
+        showError(`Dashboard failed to load: ${error.message}`);
       }
-      } catch (error) {        
-        loadData();
-    </script>
+    }
+
+    loadData();
+  </script>
 </body>
 </html>
