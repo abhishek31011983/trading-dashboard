@@ -206,46 +206,29 @@
                 });
 
                       // Load Open Risk tables
-      const openTrades = data.trades.filter(t => t.status === 'Open');
-      const cashTrades = openTrades.filter(t => t.instrument === 'Cash');
-      const futuresTrades = openTrades.filter(t => t.instrument === 'Futures');
-      
-      if (cashTrades.length > 0) {
+      const cashRiskData = data.open_risk.cash || [];
+      const derivativesRiskData = data.open_risk.derivatives || [];      
+      if (cashRiskData.length > 0) {        $('#cashRiskTable').DataTable({
         $('#cashRiskTable').DataTable({
-          data: cashTrades,
+          data: cashRiskData,
           columns: [
-            { data: 'name', title: 'Stock' },
-            { data: 'entry_price', title: 'Entry Price' },
-            { data: 'current_price', title: 'Current Price' },
-            { data: 'shares', title: 'Shares' },
-            { data: 'tsl', title: 'TSL' },
-            { data: 'total_open_risk', title: 'Open Risk' }
+            { data: 'stock', title: 'Stock Name' },
+            { data: 'open_risk', title: 'Total Open Risk' }
           ],
-          paging: false,
-          searching: false
-        });
-      }
-      
-      if (futuresTrades.length > 0) {
+
+
+                    if (derivativesRiskData.length > 0) {
         $('#futuresRiskTable').DataTable({
-          data: futuresTrades,
+          data: derivativesRiskData,
           columns: [
-            { data: 'name', title: 'Symbol' },
-            { data: 'entry_price', title: 'Entry Price' },
-            { data: 'current_price', title: 'Current Price' },
-            { data: 'shares', title: 'Quantity' },
-            { data: 'tsl', title: 'TSL' },
-            { data: 'total_open_risk', title: 'Open Risk' }
+            { data: 'symbol', title: 'Symbol Name' },
+            { data: 'open_risk', title: 'Total Open Risk' }
           ],
           paging: false,
           searching: false
         });
       }
-            } catch (error) {
-                console.error('Error loading data:', error);
-            }
-        }
-        
+      } catch (error) {        
         loadData();
     </script>
 </body>
