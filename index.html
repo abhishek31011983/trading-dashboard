@@ -265,7 +265,17 @@
         destroyDataTableIfExists('#tradesTable');
 
         if (trades.length > 0 && headers.length > 0) {
-          const headerRow = document.getElementById('tableHeaders');
+          const heaconst table = document.getElementById('tradesTable');
+
+if (!table) throw new Error("tradesTable not found");
+
+let thead = table.querySelector('thead');
+if (!thead) {
+  thead = document.createElement('thead');
+  table.appendChild(thead);
+}
+
+thead.innerHTML = '<tr>' + headers.map(h => `<th>${h}</th>`).join('') + '</tr>';yId('tableHeaders');
           headerRow.innerHTML = headers.map(h => `<th>${h}</th>`).join('');
 
           const tbody = document.getElementById('tableBody');
@@ -393,7 +403,9 @@
       }
     }
 
-    loadData();
+    document.addEventListener("DOMContentLoaded", function () {
+  loadData();
+});
   </script>
 </body>
 </html>
