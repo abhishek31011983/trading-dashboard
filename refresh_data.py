@@ -68,6 +68,33 @@ for row in cash_data_raw[1:]:  # Skip header row
             "market_conditions": row[23] if len(row) > 23 else ""
         })
 
+# Fetch Open Risk data
+open_risk_cash_tab = sheet.worksheet("Open Risk - Cash")
+open_risk_derivatives_tab = sheet.worksheet("Open Risk - Derivatives")
+
+# Get Cash Open Risk data (skip header)
+cash_risk_raw = open_risk_cash_tab.get_all_values()
+cash_risk_data = []
+if len(cash_risk_raw) > 1:
+    for row in cash_risk_raw[1:]:
+        if len(row) >= 2 and row[0]:  # Has stock name
+            cash_risk_data.append({
+                "stock": row[0],
+                "open_risk": row[1] if len(row) > 1 else ""
+            })
+
+# Get Derivatives Open Risk data (skip header)
+derivatives_risk_raw = open_risk_derivatives_tab.get_all_values()
+derivatives_risk_data = []
+if len(derivatives_risk_raw) > 1:
+    for row in derivatives_risk_raw[1:]:
+        if len(row) >= 2 and row[0]:  # Has symbol name
+            derivatives_risk_data.append({
+                "symbol": row[0],
+                "open_risk": row[1] if len(row) > 1 else ""
+            })
+
+
 data = {
     "metrics": metrics,
     "charts": {
@@ -75,6 +102,10 @@ data = {
         "segment": {"labels": segment_labels, "values": segment_values}
     },
     "trades": trades,
+        "open_risk": {
+        "cash": cash_risk_data,
+        "derivatives": derivatives_risk_data
+    },
     "headers": headers
 }
 
