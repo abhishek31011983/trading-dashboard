@@ -650,7 +650,7 @@ function renderOpenRisk(){
 
   function calcOpen(positions){     let tot=0,prot=0;     positions.forEach(t=>{       const r=pn(t.open_risk_per_share);       if(r!==null){tot+=r;if(r<=0)prot++;}     });     return {tot,prot};
     let tot=0, prot=0;
-    positions.forEach(t=>{const r=pn(t.total_risk);if(r!==null){tot+=r;if(r<=0)prot++;}});
+    positions.forEach(t=>{const r=pn(t.open_risk_per_share);if(r!==null){tot+=r;if(r<=0)prot++;}});
     return {tot,prot};
   }
   const co=calcOpen(cashO), fo=calcOpen(foO);
@@ -684,7 +684,7 @@ function renderOpenRisk(){
           <div class="rbar ${isP?'pos':'neg'}" style="width:${bw}px"></div>
           <span class="${isP?'up':'down'} mono">${isP?'-':'+'}${fr(Math.abs(or||0))}</span>
         </div></td>
-        <td class="mono">${t.risk_on_portfolio&&t.risk_on_portfolio!=='#DIV/0!'?t.risk_on_portfolio:'—'}</td>
+        <td class="mono">${g.port&&g.port!=='#DIV/0!'?g.port:'—'}</td>
       </tr>`;
     }).join('');
   }
