@@ -427,20 +427,20 @@ function calcMetrics(trades) {
   const open   = trades.filter(t => t.status==='Open');
   let pnl=0, wins=0, gw=0, gl=0;
   closed.forEach(t => {
-    const pl = pn(t.total_pl);
+    const pl = pn(t.pl_per_share);
     if (pl !== null) { pnl += pl; if(pl>0){wins++;gw+=pl;}else gl+=Math.abs(pl); }
   });
   const wr = closed.length ? ((wins/closed.length)*100).toFixed(1) : '0';
   const pf = gl>0 ? (gw/gl).toFixed(2) : wins>0?'∞':'0';
   let sumRR=0, rrC=0;
-  closed.filter(t=>pn(t.total_pl)>0).forEach(t => {
-    const risk=pn(t.total_risk), pl=pn(t.total_pl);
+  closed.filter(t=>pn(t.pl_per_share)>0).forEach(t => {
+    const risk=pn(t.total_risk), pl=pn(t.pl_per_share);
     if(risk&&risk>0&&pl){sumRR+=pl/risk;rrC++;}
   });
   const avgRR = rrC ? (sumRR/rrC).toFixed(2) : '—';
   let openRisk=0;
-  open.forEach(t=>{ const r=pn(t.total_open_risk); if(r!==null) openRisk+=r; });
-  const prot = open.filter(t=>pn(t.total_open_risk)!==null&&pn(t.total_open_risk)<=0).length;
+  open.forEach(t=>{ const r=pn(t.total_risk); if(r!==null) openRisk+=r; });
+  const prot = open.filter(t=>pn(t.total_risk)!==null&&pn(t.total_risk)<=0).length;
   return { pnl, wins, wr, pf, avgRR, openRisk, total:trades.length, closedN:closed.length, openN:open.length, prot };
 }
 
@@ -543,10 +543,10 @@ function renderAllCharts(){
 
 function renderEquity(id, trades, color, dark){
   dc(id);
-  const closed=trades.filter(t=>t.status==='Closed'&&pn(t.total_pl)!==null)
+  const closed=trades.filter(t=>t.status==='Closed'&&pn(t.pl_per_share)!==null)
     .sort((a,b)=>new Date(a.entry_date)-new Date(b.entry_date));
   let cum=0; const labels=[], vals=[];
-  closed.forEach((t,i)=>{ cum+=pn(t.total_pl)||0; labels.push(t.name+(i+1)); vals.push(cum); });
+  closed.forEach((t,i)=>{ cum+=pn(t.pl_per_share)||0; labels.push(t.name+(i+1)); vals.push(cum); });
   const bg=dark?`${color}18`:`${color}15`;
   CI[id]=new Chart(document.getElementById(id),{
     type:'line',
@@ -572,7 +572,7 @@ function renderMonthly(cash, fo, dark){
       if(isNaN(d)) return;
       const key=`${d.toLocaleString('en-IN',{month:'short'})}-${String(d.getFullYear()).slice(-2)}`;
       if(!byMonth[key]) byMonth[key]={cash:0,fo:0};
-      const pl=pn(t.total_pl)||0;
+      const pl=pn(t.pl_per_share)||0;
       if(t._type==='cash') byMonth[key].cash+=pl;
       else byMonth[key].fo+=pl;
     });
@@ -619,7 +619,7 @@ function renderJ(){
   const b=document.getElementById('jBody');
   if(!rows.length){b.innerHTML=`<tr><td colspan="13" style="text-align:center;padding:2rem;color:var(--muted)">No trades match</td></tr>`;return;}
   b.innerHTML=rows.map(t=>{
-    const pl=pn(t.total_pl);
+    const pl=pn(t.pl_per_share);
     const plCls=pl===null?'neutral':pl>0?'up':'down';
     const plStr=pl===null?'—':fr(pl,true);
     const risk=pn(t.total_risk);
@@ -650,11 +650,11 @@ function renderOpenRisk(){
 
   function calcOpen(positions){
     let tot=0, prot=0;
-    positions.forEach(t=>{const r=pn(t.total_open_risk);if(r!==null){tot+=r;if(r<=0)prot++;}});
+    positions.forEach(t=>{const r=pn(t.total_risk);if(r!==null){tot+=r;if(r<=0)prot++;}});
     return {tot,prot};
   }
   const co=calcOpen(cashO), fo=calcOpen(foO);
-  const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.total_open_risk)||0)),1);
+  const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.total_risk)||0)),1);
 
   document.getElementById('co-risk').textContent=fr(co.tot,true);
   document.getElementById('co-risk').className='kpi-val '+(co.tot<=0?'up':'down');
@@ -670,7 +670,7 @@ function renderOpenRisk(){
   function openRows(positions){
     if(!positions.length) return `<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:var(--muted)">No open positions</td></tr>`;
     return positions.map(t=>{
-      const or=pn(t.total_open_risk);
+      const or=pn(t.total_risk);
       const isP=or!==null&&or<=0;
       const bw=Math.min(80,Math.round((Math.abs(or||0)/maxR)*80));
       return `<tr>
@@ -702,7 +702,7 @@ function renderAnalytics(){
   function wlDonut(id, trades, color){
     dc(id);
     let w=0,l=0;
-    trades.forEach(t=>{const pl=pn(t.total_pl);if(pl!==null){if(pl>0)w++;else l++;}});
+    trades.forEach(t=>{const pl=pn(t.pl_per_share);if(pl!==null){if(pl>0)w++;else l++;}});
     CI[id]=new Chart(document.getElementById(id),{
       type:'doughnut',
       data:{labels:['Wins','Losses'],datasets:[{data:[w,l],
@@ -717,7 +717,7 @@ function renderAnalytics(){
   function rrBar(id, trades, color){
     dc(id);
     const data=trades.map(t=>{
-      const risk=pn(t.total_risk), pl=pn(t.total_pl);
+      const risk=pn(t.total_risk), pl=pn(t.pl_per_share);
       if(!risk||risk===0||pl===null) return null;
       return {name:t.name, rr:pl/risk};
     }).filter(Boolean);
@@ -737,7 +737,7 @@ function renderAnalytics(){
   rrBar('rr-fo',   fo,   FO_C);
 
   function topList(winEl, lossEl, trades){
-    const sorted=trades.map(t=>({name:t.name,pl:pn(t.total_pl),seg:t.segment}))
+    const sorted=trades.map(t=>({name:t.name,pl:pn(t.pl_per_share),seg:t.segment}))
       .filter(t=>t.pl!==null).sort((a,b)=>b.pl-a.pl);
     const w5=sorted.filter(t=>t.pl>0).slice(0,5);
     const l5=sorted.filter(t=>t.pl<0).slice(-5).reverse();
