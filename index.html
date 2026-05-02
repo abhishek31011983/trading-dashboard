@@ -629,13 +629,13 @@ function renderJ(){
       <td><span class="badge ${isFO(t)?'b-fo':'b-cash'}">${isFO(t)?'F&O':'Cash'}</span></td>
       <td><span class="badge ${t.status==='Open'?'b-open':'b-closed'}">${t.status}</span></td>
       <td>${t.entry_date||'—'}</td>
-      <td style="font-weight:600">${t.name||'—'}</td>
+      <td style="font-weight:600">${g.name}</td>
       <td><span class="badge ${t.type==='Long'?'b-long':'b-short'}">${t.type||'—'}</span></td>
-      <td>${t.segment||'—'}</td>
-      <td class="mono">${t.shares||'—'}</td>
-      <td class="mono">₹${t.entry_price||'—'}</td>
-      <td class="mono">₹${t.stop_loss||'—'}</td>
-      <td class="mono">${t.tsl?'₹'+t.tsl:'—'}</td>
+      <td>${g.seg||'—'}</td>
+      <td class="mono">${g.sh}</td>
+      ${g.sh}</td >
+      ${g.sh}</td  >
+      <td class="mono">${g.tsl?'₹'+g.tsl:'—'}</td>
       <td class="mono">${t.exit_price?'₹'+t.exit_price:'—'}</td>
       <td class="${plCls} mono">${plStr}</td>
       <td class="${rrCls} mono">${rrStr}</td>
@@ -650,7 +650,7 @@ function renderOpenRisk(){
 
   function calcOpen(positions){
     let tot=0, prot=0;
-    positions.forEach(t=>{const r=pn(t.total_risk);if(r!==null){tot+=r;if(r<=0)prot++;}});
+    positions.forEach(t=>{const r=pn(t.open_risk_per_share);if(r!==null){tot+=r;if(r<=0)prot++;}});
     return {tot,prot};
   }
   const co=calcOpen(cashO), fo=calcOpen(foO);
@@ -669,22 +669,22 @@ function renderOpenRisk(){
 
   function openRows(positions){
     if(!positions.length) return `<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:var(--muted)">No open positions</td></tr>`;
-    return positions.map(t=>{
-      const or=pn(t.total_risk);
-      const isP=or!==null&&or<=0;
+    const grp={};positions.forEach(t=>{const n=t.name||'?';if(!grp[n])grp[n]={name:n,seg:t.segment,sh:0,tsl:'',or:0};grp[n].sh+=pn(t.shares)||0;const r=pn(t.open_risk_per_share);if(r!==null)grp[n].or+=r;if(t.tsl)grp[n].tsl=t.tsl;});return Object.values(grp).map(g=>{
+      const or=g.or;
+      const isP=or<=0;
       const bw=Math.min(80,Math.round((Math.abs(or||0)/maxR)*80));
       return `<tr>
-        <td style="font-weight:600">${t.name||'—'}</td>
-        <td>${t.segment||'—'}</td>
-        <td class="mono">${t.shares||'—'}</td>
-        <td class="mono">₹${t.entry_price||'—'}</td>
-        <td class="mono">₹${t.stop_loss||'—'}</td>
-        <td class="mono">${t.tsl?'₹'+t.tsl:'—'}</td>
+        <td style="font-weight:600">${g.name}</td>
+        <td>${g.seg||'—'}</td>
+        <td class="mono">${g.sh}</td>
+        ${g.sh}</td >
+        ${g.sh}</td  >
+        <td class="mono">${g.tsl?'₹'+g.tsl:'—'}</td>
         <td><div class="rbar-cell">
           <div class="rbar ${isP?'pos':'neg'}" style="width:${bw}px"></div>
           <span class="${isP?'up':'down'} mono">${isP?'-':'+'}${fr(Math.abs(or||0))}</span>
         </div></td>
-        <td class="mono">${t.risk_on_portfolio&&t.risk_on_portfolio!=='#DIV/0!'?t.risk_on_portfolio:'—'}</td>
+        ${g.tsl?'₹'+ g.tsl:'—'}</td>
       </tr>`;
     }).join('');
   }
