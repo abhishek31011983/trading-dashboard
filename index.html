@@ -648,13 +648,13 @@ function renderOpenRisk(){
   const cashO=T.filter(t=>t.status==='Open'&&t.instrument==='Cash');
   const foO  =T.filter(t=>t.status==='Open'&&t.instrument==='Futures/Options');
 
-  function calcOpen(positions){     let tot=0,prot=0;     positions.forEach(t=>{       const r=pn(t.open_risk_per_share);       if(r!==null){tot+=r;if(r<=0)prot++;}     });     return {tot,prot};
+  function calcOpen(positions){
     let tot=0, prot=0;
-    positions.forEach(t=>{const r=pn(t.open_risk_per_share);if(r!==null){tot+=r;if(r<=0)prot++;}});
+    positions.forEach(t=>{const r=pn(t.total_risk);if(r!==null){tot+=r;if(r<=0)prot++;}});
     return {tot,prot};
   }
   const co=calcOpen(cashO), fo=calcOpen(foO);
-  const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.open_risk_per_share)||0)),1);
+  const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.total_risk)||0)),1);
 
   document.getElementById('co-risk').textContent=fr(co.tot,true);
   document.getElementById('co-risk').className='kpi-val '+(co.tot<=0?'up':'down');
@@ -667,7 +667,7 @@ function renderOpenRisk(){
   document.getElementById('fo-detail').textContent=`${fo.prot} protected · ${foO.length-fo.prot} at risk`;
   document.getElementById('fo-prot').textContent=fo.prot;
 
-  function openRows(positions){     if(!positions.length) return `<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:var(--muted)">No open positions</td></tr>`;     // Group by stock name     const grouped={};     positions.forEach(t=>{       const n=t.name||'Unknown';       if(!grouped[n]) grouped[n]={name:n,segment:t.segment,totalShares:0,entryPrices:[],sl:t.stop_loss,tsl:t.tsl,openRisk:0,port:t.risk_on_portfolio};       const sh=pn(t.shares)||0;       const orp=pn(t.open_risk_per_share);       grouped[n].totalShares+=sh;       grouped[n].entryPrices.push(t.entry_price);       if(orp!==null) grouped[n].openRisk+=orp*sh;     });     return Object.values(grouped).map(g=>{       const or=g.openRisk;       const isP=or<=0;       const bw=Math.min(80,Math.round((Math.abs(or||0)/maxR)*80));       const entryDisp=g.entryPrices.length>1?'Multiple':'₹'+g.entryPrices[0];       return `<tr>         <td style="font-weight:600">${g.name}</td>         <td>${g.segment||'—'}</td>         <td class="mono">${g.totalShares}</td>         <td class="mono">${entryDisp}</td>         <td class="mono">₹${g.sl||'—'}</td>         <td class="mono">${g.tsl?'₹'+g.tsl:'—'}</td>         <td><div class="rbar-cell">           <div class="rbar ${isP?'pos':'neg'}" style="width:${bw}px"></div>           <span class="${isP?'up':'down'} mono">${isP?'':'+'}${fr(Math.abs(or||0))}</span>         </div></td>         <td class="mono">${g.port&&g.port!=='#DIV/0!'?g.port:'—'}</td>       </tr>`;     }).join('');
+  function openRows(positions){
     if(!positions.length) return `<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:var(--muted)">No open positions</td></tr>`;
     return positions.map(t=>{
       const or=pn(t.total_risk);
@@ -684,7 +684,7 @@ function renderOpenRisk(){
           <div class="rbar ${isP?'pos':'neg'}" style="width:${bw}px"></div>
           <span class="${isP?'up':'down'} mono">${isP?'-':'+'}${fr(Math.abs(or||0))}</span>
         </div></td>
-        <td class="mono">${g.port&&g.port!=='#DIV/0!'?g.port:'—'}</td>
+        <td class="mono">${t.risk_on_portfolio&&t.risk_on_portfolio!=='#DIV/0!'?t.risk_on_portfolio:'—'}</td>
       </tr>`;
     }).join('');
   }
