@@ -13,7 +13,7 @@ client = gspread.authorize(creds)
 # 2. Open your Sheet
 sheet = client.open_by_key('1hqg0c7PGiEaxC-PpOuyCSfivwyhPKgS0mpbNIa55Zio')
 dash_tab = sheet.worksheet("dashboard")
-cash_tab = sheet.worksheet("All Trades")
+all_trades_tab = sheet.worksheet("All Trades")
 
 # 3. Fetch Data
 # Main Metrics
@@ -27,45 +27,80 @@ metrics = {
 }
 
 # Monthly Data (Rows 15-26, Columns B & C)
-monthly_labels = dash_tab.col_values(2)[14:26] # Column B (Month)
-monthly_values = dash_tab.col_values(3)[14:26] # Column C (Closed P&L)
+monthly_labels = dash_tab.col_values(2)[14:26]  # Column B (Month)
+monthly_values = dash_tab.col_values(3)[14:26]  # Column C (Closed P&L)
 
 # Segment Data (Rows 15-21, Columns G & H)
-segment_labels = dash_tab.col_values(7)[14:21] # Column G (Segment)
-segment_values = dash_tab.col_values(8)[14:21] # Column H (P&L)
+segment_labels = dash_tab.col_values(7)[14:21]  # Column G (Segment)
+segment_values = dash_tab.col_values(8)[14:21]  # Column H (P&L)
 
-# Cash sheet data - all rows starting from row 2 (skip header)
-cash_data_raw = cash_tab.get_all_values()
-headers = cash_data_raw[0] if cash_data_raw else []
+# All Trades sheet data - all rows starting from row 2 (skip header)
+# Column mapping (0-indexed):
+# A=0  status
+# B=1  entry_date
+# C=2  name
+# D=3  current_price
+# E=4  type (Long/Short)
+# F=5  instrument (Cash / Futures / Options)
+# G=6  segment
+# H=7  shares
+# I=8  entry_price
+# J=9  total_amount
+# K=10 stop_loss
+# L=11 risk_per_share
+# M=12 total_risk
+# N=13 lot_number
+# O=14 tsl
+# P=15 open_risk_per_share
+# Q=16 total_open_risk
+# R=17 portfolio_size
+# S=18 risk_on_portfolio
+# T=19 exit_price
+# U=20 exit_date
+# V=21 pl_per_share       <- Profit/Loss per share
+# W=22 total_pl           <- Total Profit/Loss (PRIMARY P&L FIELD)
+# X=23 entry_charges
+# Y=24 exit_charges
+# Z=25 mtf_interest
+# AA=26 rr_achieved
+# AB=27 comments
+# AC=28 market_conditions
+
+all_trades_raw = all_trades_tab.get_all_values()
+headers = all_trades_raw[0] if all_trades_raw else []
 trades = []
-
-for row in cash_data_raw[1:]:  # Skip header row
+for row in all_trades_raw[1:]:  # Skip header row
     if len(row) >= 11:  # Ensure row has enough columns
         trades.append({
-            "status": row[0] if len(row) > 0 else "",
-            "entry_date": row[1] if len(row) > 1 else "",
-            "name": row[2] if len(row) > 2 else "",
-            "current_price": row[3] if len(row) > 3 else "",
-            "type": row[4] if len(row) > 4 else "",
-            "instrument": row[5] if len(row) > 5 else "",
-            "segment": row[6] if len(row) > 6 else "",
-            "shares": row[7] if len(row) > 7 else "",
-            "entry_price": row[8] if len(row) > 8 else "",
-            "total_amount": row[9] if len(row) > 9 else "",
-            "stop_loss": row[10] if len(row) > 10 else "",
-            "risk_share": row[11] if len(row) > 11 else "",
-            "total_risk": row[12] if len(row) > 12 else "",
-            "tsl": row[13] if len(row) > 13 else "",
-            "open_risk_share": row[14] if len(row) > 14 else "",
-            "total_open_risk": row[15] if len(row) > 15 else "",
-            "portfolio_size": row[16] if len(row) > 16 else "",
-            "risk_on_portfolio": row[17] if len(row) > 17 else "",
-            "exit_price": row[18] if len(row) > 18 else "",
-            "pl_share": row[19] if len(row) > 19 else "",
-            "total_pl": row[20] if len(row) > 20 else "",
-            "rr_achieved": row[21] if len(row) > 21 else "",
-            "comments": row[22] if len(row) > 22 else "",
-            "market_conditions": row[23] if len(row) > 23 else ""
+            "status":             row[0]  if len(row) > 0  else "",
+            "entry_date":         row[1]  if len(row) > 1  else "",
+            "name":               row[2]  if len(row) > 2  else "",
+            "current_price":      row[3]  if len(row) > 3  else "",
+            "type":               row[4]  if len(row) > 4  else "",
+            "instrument":         row[5]  if len(row) > 5  else "",
+            "segment":            row[6]  if len(row) > 6  else "",
+            "shares":             row[7]  if len(row) > 7  else "",
+            "entry_price":        row[8]  if len(row) > 8  else "",
+            "total_amount":       row[9]  if len(row) > 9  else "",
+            "stop_loss":          row[10] if len(row) > 10 else "",
+            "risk_per_share":     row[11] if len(row) > 11 else "",
+            "total_risk":         row[12] if len(row) > 12 else "",
+            "lot_number":         row[13] if len(row) > 13 else "",
+            "tsl":                row[14] if len(row) > 14 else "",
+            "open_risk_per_share":row[15] if len(row) > 15 else "",
+            "total_open_risk":    row[16] if len(row) > 16 else "",
+            "portfolio_size":     row[17] if len(row) > 17 else "",
+            "risk_on_portfolio":  row[18] if len(row) > 18 else "",
+            "exit_price":         row[19] if len(row) > 19 else "",
+            "exit_date":          row[20] if len(row) > 20 else "",
+            "pl_per_share":       row[21] if len(row) > 21 else "",
+            "total_pl":           row[22] if len(row) > 22 else "",
+            "entry_charges":      row[23] if len(row) > 23 else "",
+            "exit_charges":       row[24] if len(row) > 24 else "",
+            "mtf_interest":       row[25] if len(row) > 25 else "",
+            "rr_achieved":        row[26] if len(row) > 26 else "",
+            "comments":           row[27] if len(row) > 27 else "",
+            "market_conditions":  row[28] if len(row) > 28 else ""
         })
 
 # Fetch Open Risk data
@@ -79,7 +114,7 @@ if len(cash_risk_raw) > 1:
     for row in cash_risk_raw[1:]:
         if len(row) >= 2 and row[0]:  # Has stock name
             cash_risk_data.append({
-                "stock": row[0],
+                "stock":     row[0],
                 "open_risk": row[1] if len(row) > 1 else ""
             })
 
@@ -90,10 +125,9 @@ if len(derivatives_risk_raw) > 1:
     for row in derivatives_risk_raw[1:]:
         if len(row) >= 2 and row[0]:  # Has symbol name
             derivatives_risk_data.append({
-                "symbol": row[0],
+                "symbol":    row[0],
                 "open_risk": row[1] if len(row) > 1 else ""
             })
-
 
 data = {
     "metrics": metrics,
@@ -102,8 +136,8 @@ data = {
         "segment": {"labels": segment_labels, "values": segment_values}
     },
     "trades": trades,
-        "open_risk": {
-        "cash": cash_risk_data,
+    "open_risk": {
+        "cash":        cash_risk_data,
         "derivatives": derivatives_risk_data
     },
     "headers": headers
