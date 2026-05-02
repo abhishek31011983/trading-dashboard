@@ -334,7 +334,7 @@ table.t tbody tr:last-child{border-bottom:none;}
       <div class="card-hdr"><span class="card-title" style="color:var(--cash-color)">Cash Open Positions</span></div>
       <div class="tbl-wrap">
         <table class="t">
-          <thead><tr><th>Name</th><th>Segment</th><th>Qty</th><th>Entry ₹</th><th>SL ₹</th><th>TSL ₹</th><th>Open Risk</th><th>% Port</th></tr></thead>
+          <thead><tr><th>Name</th><th>Segment</th><th>Shares</th><th>TSL ₹</th><th>Total Open Risk</th></tr></thead>
           <tbody id="cashOpenBody"></tbody>
         </table>
       </div>
@@ -343,7 +343,7 @@ table.t tbody tr:last-child{border-bottom:none;}
       <div class="card-hdr"><span class="card-title" style="color:var(--fo-color)">F&O Open Positions</span></div>
       <div class="tbl-wrap">
         <table class="t">
-          <thead><tr><th>Name</th><th>Segment</th><th>Qty</th><th>Entry ₹</th><th>SL ₹</th><th>TSL ₹</th><th>Open Risk</th><th>% Port</th></tr></thead>
+          <thead><tr><th>Name</th><th>Segment</th><th>Shares</th><th>TSL ₹</th><th>Total Open Risk</th></tr></thead>
           <tbody id="foOpenBody"></tbody>
         </table>
       </div>
@@ -654,7 +654,7 @@ function renderOpenRisk(){
     return {tot,prot};
   }
   const co=calcOpen(cashO), fo=calcOpen(foO);
-  const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.total_risk)||0)),1);
+  const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.open_risk_per_share)||0)),1);
 
   document.getElementById('co-risk').textContent=fr(co.tot,true);
   document.getElementById('co-risk').className='kpi-val '+(co.tot<=0?'up':'down');
