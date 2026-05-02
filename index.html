@@ -648,13 +648,13 @@ function renderOpenRisk(){
   const cashO=T.filter(t=>t.status==='Open'&&t.instrument==='Cash');
   const foO  =T.filter(t=>t.status==='Open'&&t.instrument==='Futures/Options');
 
-  function calcOpen(positions){     let tot=0,prot=0;     positions.forEach(t=>{       const orp=pn(t.open_risk_per_share),sh=pn(t.shares);       const r=(orp!==null&&sh!==null)?orp*sh:null;       if(r!==null){tot+=r;if(r<=0)prot++;}     });     return {tot,prot};
+  function calcOpen(positions){     let tot=0,prot=0;     positions.forEach(t=>{       const r=pn(t.open_risk_per_share);       if(r!==null){tot+=r;if(r<=0)prot++;}     });     return {tot,prot};
     let tot=0, prot=0;
     positions.forEach(t=>{const r=pn(t.total_risk);if(r!==null){tot+=r;if(r<=0)prot++;}});
     return {tot,prot};
   }
   const co=calcOpen(cashO), fo=calcOpen(foO);
-  const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs((pn(t.open_risk_per_share)||0)*(pn(t.shares)||0))),1);
+  const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.open_risk_per_share)||0)),1);
 
   document.getElementById('co-risk').textContent=fr(co.tot,true);
   document.getElementById('co-risk').className='kpi-val '+(co.tot<=0?'up':'down');
