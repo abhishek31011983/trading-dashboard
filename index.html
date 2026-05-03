@@ -791,7 +791,7 @@ function renderOpenRisk(){
       grp[n].sh+=pn(t.shares)||0;
       const r=pn(t.total_open_risk);
       if(r!==null)grp[n].or+=r;
-      if(t.tsl && !grp[n].tsl)=t.tsl;
+      if(t.tsl && !grp[n].tsl) grp[n].tsl=t.tsl;
     });
     return Object.values(grp).map(g=>{
       const or=g.or;
