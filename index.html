@@ -582,11 +582,11 @@ async function loadData(){
     if(!r.ok) throw new Error(r.status);
     const d=await r.json();
     T=d.trades||[];
-    window._data = d;
+    window._D=d;
     renderOverview();
     const active=document.querySelector('.page.active').id;
     if(active==='journal') renderJ();
-    if(active==='openrisk') renderOpenRisk();
+    if(active==='openrisk') renderOpenRisk(d);
     if(active==='analytics') renderAnalytics();
     document.getElementById('lastUpd').innerHTML=
       `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Updated ${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
@@ -759,7 +759,7 @@ function renderJ(){
 }
 
 // ── OPEN RISK ──────────────────────────────────────────────────
-function renderOpenRisk(){
+function renderOpenRisk(d){
   const cashO=T.filter(t=>t.status==='Open'&&t.instrument==='Cash');
   const foO =T.filter(t=>t.status==='Open'&&t.instrument==='Futures/Options');
 
@@ -809,7 +809,9 @@ function renderOpenRisk(){
       </tr>`;
     }).join('');
   }
-  const cashRisk=(window._D&&window._D.open_risk&&window._D.open_risk.cash)||[];
+  const _d=d||window._D||{};
+  const _d=d||window._D||{};
+  const foRisk=(_d.open_risk&&_d.open_risk.derivatives)||[];
   const foRisk=(window._D&&window._D.open_risk&&window._D.open_risk.derivatives)||[];
   document.getElementById('cashOpenBody').innerHTML=openRows(cashO,cashRisk);
   document.getElementById('foOpenBody').innerHTML=openRows(foO,foRisk);
