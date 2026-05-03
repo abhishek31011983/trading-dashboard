@@ -27,15 +27,14 @@ metrics = {
 }
 
 # Monthly Data (Rows 15-26, Columns B & C)
-monthly_labels = dash_tab.col_values(2)[14:26]  # Column B (Month)
-monthly_values = dash_tab.col_values(3)[14:26]  # Column C (Closed P&L)
+monthly_labels = dash_tab.col_values(2)[14:26]
+monthly_values = dash_tab.col_values(3)[14:26]
 
 # Segment Data (Rows 15-21, Columns G & H)
-segment_labels = dash_tab.col_values(7)[14:21]  # Column G (Segment)
-segment_values = dash_tab.col_values(8)[14:21]  # Column H (P&L)
+segment_labels = dash_tab.col_values(7)[14:21]
+segment_values = dash_tab.col_values(8)[14:21]
 
-# All Trades sheet data - all rows starting from row 2 (skip header)
-# Column mapping (0-indexed):
+# All Trades sheet - column mapping (0-indexed):
 # A=0  status
 # B=1  entry_date
 # C=2  name
@@ -49,16 +48,16 @@ segment_values = dash_tab.col_values(8)[14:21]  # Column H (P&L)
 # K=10 stop_loss
 # L=11 risk_per_share
 # M=12 total_risk
-# N=13 lot_number
-# O=14 tsl
-# P=15 open_risk_per_share
+# N=13 tsl                <- Col N = TSL
+# O=14 open_risk_per_share_unit
+# P=15 open_risk_per_share <- Col P = Total Open Risk (used in dashboard)
 # Q=16 total_open_risk
 # R=17 portfolio_size
 # S=18 risk_on_portfolio
 # T=19 exit_price
 # U=20 exit_date
-# V=21 pl_per_share       <- Profit/Loss per share
-# W=22 total_pl           <- Total Profit/Loss (PRIMARY P&L FIELD)
+# V=21 pl_per_share
+# W=22 total_pl           <- PRIMARY P&L FIELD
 # X=23 entry_charges
 # Y=24 exit_charges
 # Z=25 mtf_interest
@@ -69,65 +68,57 @@ segment_values = dash_tab.col_values(8)[14:21]  # Column H (P&L)
 all_trades_raw = all_trades_tab.get_all_values()
 headers = all_trades_raw[0] if all_trades_raw else []
 trades = []
-for row in all_trades_raw[1:]:  # Skip header row
-    if len(row) >= 11:  # Ensure row has enough columns
+for row in all_trades_raw[1:]:
+    if len(row) >= 11:
         trades.append({
-            "status":             row[0]  if len(row) > 0  else "",
-            "entry_date":         row[1]  if len(row) > 1  else "",
-            "name":               row[2]  if len(row) > 2  else "",
-            "current_price":      row[3]  if len(row) > 3  else "",
-            "type":               row[4]  if len(row) > 4  else "",
-            "instrument":         row[5]  if len(row) > 5  else "",
-            "segment":            row[6]  if len(row) > 6  else "",
-            "shares":             row[7]  if len(row) > 7  else "",
-            "entry_price":        row[8]  if len(row) > 8  else "",
-            "total_amount":       row[9]  if len(row) > 9  else "",
-            "stop_loss":          row[10] if len(row) > 10 else "",
-            "risk_per_share":     row[11] if len(row) > 11 else "",
-            "total_risk":         row[12] if len(row) > 12 else "",
-            "lot_number":         row[13] if len(row) > 13 else "",
-            "tsl":                row[14] if len(row) > 14 else "",
-            "open_risk_per_share":row[15] if len(row) > 15 else "",
-            "total_open_risk":    row[16] if len(row) > 16 else "",
-            "portfolio_size":     row[17] if len(row) > 17 else "",
-            "risk_on_portfolio":  row[18] if len(row) > 18 else "",
-            "exit_price":         row[19] if len(row) > 19 else "",
-            "exit_date":          row[20] if len(row) > 20 else "",
-            "pl_per_share":       row[21] if len(row) > 21 else "",
-            "total_pl":           row[22] if len(row) > 22 else "",
-            "entry_charges":      row[23] if len(row) > 23 else "",
-            "exit_charges":       row[24] if len(row) > 24 else "",
-            "mtf_interest":       row[25] if len(row) > 25 else "",
-            "rr_achieved":        row[26] if len(row) > 26 else "",
-            "comments":           row[27] if len(row) > 27 else "",
-            "market_conditions":  row[28] if len(row) > 28 else ""
+            "status":              row[0]  if len(row) > 0  else "",
+            "entry_date":          row[1]  if len(row) > 1  else "",
+            "name":                row[2]  if len(row) > 2  else "",
+            "current_price":       row[3]  if len(row) > 3  else "",
+            "type":                row[4]  if len(row) > 4  else "",
+            "instrument":          row[5]  if len(row) > 5  else "",
+            "segment":             row[6]  if len(row) > 6  else "",
+            "shares":              row[7]  if len(row) > 7  else "",
+            "entry_price":         row[8]  if len(row) > 8  else "",
+            "total_amount":        row[9]  if len(row) > 9  else "",
+            "stop_loss":           row[10] if len(row) > 10 else "",
+            "risk_per_share":      row[11] if len(row) > 11 else "",
+            "total_risk":          row[12] if len(row) > 12 else "",
+            "tsl":                 row[13] if len(row) > 13 else "",
+            "open_risk_per_share_unit": row[14] if len(row) > 14 else "",
+            "open_risk_per_share": row[15] if len(row) > 15 else "",
+            "total_open_risk":     row[16] if len(row) > 16 else "",
+            "portfolio_size":      row[17] if len(row) > 17 else "",
+            "risk_on_portfolio":   row[18] if len(row) > 18 else "",
+            "exit_price":          row[19] if len(row) > 19 else "",
+            "exit_date":           row[20] if len(row) > 20 else "",
+            "pl_per_share":        row[21] if len(row) > 21 else "",
+            "total_pl":            row[22] if len(row) > 22 else "",
+            "entry_charges":       row[23] if len(row) > 23 else "",
+            "exit_charges":        row[24] if len(row) > 24 else "",
+            "mtf_interest":        row[25] if len(row) > 25 else "",
+            "rr_achieved":         row[26] if len(row) > 26 else "",
+            "comments":            row[27] if len(row) > 27 else "",
+            "market_conditions":   row[28] if len(row) > 28 else ""
         })
 
-# Fetch Open Risk data
+# Open Risk tabs
 open_risk_cash_tab = sheet.worksheet("Open Risk - Cash")
 open_risk_derivatives_tab = sheet.worksheet("Open Risk - Derivatives")
 
-# Get Cash Open Risk data (skip header)
 cash_risk_raw = open_risk_cash_tab.get_all_values()
 cash_risk_data = []
 if len(cash_risk_raw) > 1:
     for row in cash_risk_raw[1:]:
-        if len(row) >= 2 and row[0]:  # Has stock name
-            cash_risk_data.append({
-                "stock":     row[0],
-                "open_risk": row[1] if len(row) > 1 else ""
-            })
+        if len(row) >= 2 and row[0]:
+            cash_risk_data.append({"stock": row[0], "open_risk": row[1] if len(row) > 1 else ""})
 
-# Get Derivatives Open Risk data (skip header)
 derivatives_risk_raw = open_risk_derivatives_tab.get_all_values()
 derivatives_risk_data = []
 if len(derivatives_risk_raw) > 1:
     for row in derivatives_risk_raw[1:]:
-        if len(row) >= 2 and row[0]:  # Has symbol name
-            derivatives_risk_data.append({
-                "symbol":    row[0],
-                "open_risk": row[1] if len(row) > 1 else ""
-            })
+        if len(row) >= 2 and row[0]:
+            derivatives_risk_data.append({"symbol": row[0], "open_risk": row[1] if len(row) > 1 else ""})
 
 data = {
     "metrics": metrics,
@@ -137,12 +128,11 @@ data = {
     },
     "trades": trades,
     "open_risk": {
-        "cash":        cash_risk_data,
+        "cash": cash_risk_data,
         "derivatives": derivatives_risk_data
     },
     "headers": headers
 }
 
-# 4. Save to JSON
 with open('data.json', 'w') as f:
     json.dump(data, f)
