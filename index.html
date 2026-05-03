@@ -571,7 +571,7 @@ function go(name){
   document.getElementById(name).classList.add('active');
   document.getElementById('btn-'+name).classList.add('active');
   if(name==='journal') renderJ();
-  if(name==='openrisk') renderOpenRisk();
+  if(name==='openrisk') renderOpenRisk(window._D);
   if(name==='analytics') renderAnalytics();
 }
 
