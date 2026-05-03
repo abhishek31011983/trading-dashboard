@@ -582,6 +582,7 @@ async function loadData(){
     if(!r.ok) throw new Error(r.status);
     const d=await r.json();
     T=d.trades||[];
+    window._data = d;
     renderOverview();
     const active=document.querySelector('.page.active').id;
     if(active==='journal') renderJ();
@@ -782,21 +783,20 @@ function renderOpenRisk(){
   document.getElementById('fo-detail').textContent=`${fo.prot} protected · ${foO.length-fo.prot} at risk`;
   document.getElementById('fo-prot').textContent=fo.prot;
 
-  function openRows(positions){
+  function openRows(positions, riskData){
     if(!positions.length) return `<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--muted)">No open positions</td></tr>`;
     const grp={};
     positions.forEach(t=>{
       const n=t.name||'?';
-      if(!grp[n])grp[n]={name:n,seg:t.segment,sh:0,tsl:'',or:0};
+      if(!grp[n])grp[n]={name:n,seg:t.segment,sh:0,tsl:'',or:null};
       grp[n].sh+=pn(t.shares)||0;
-      const r=pn(t.total_open_risk);
-      if(r!==null)grp[n].or+=r;
       if(t.tsl && !grp[n].tsl) grp[n].tsl=t.tsl;
     });
+    (riskData||[]).forEach(r=>{if(r.stock&&r.stock!=='Stock Name'&&grp[r.stock])grp[r.stock].or=pn(String(r.open_risk).replace(/,/g,''));});
     return Object.values(grp).map(g=>{
       const or=g.or;
-      const isP=or<=0;
-      const bw=Math.min(80,Math.round((Math.abs(or||0)/maxR)*80));
+      const isP=or===null||or<=0;
+      const bw=or!==null?Math.min(80,Math.round((Math.abs(or||0)/maxR)*80)):0;
       return `<tr>
         <td style="font-weight:600">${g.name}</td>
         <td>${g.seg||'—'}</td>
@@ -804,13 +804,15 @@ function renderOpenRisk(){
         <td class="mono">${g.tsl?'₹'+g.tsl:'—'}</td>
         <td><div class="rbar-cell">
           <div class="rbar ${isP?'pos':'neg'}" style="width:${bw}px"></div>
-          <span class="${isP?'up':'down'} mono">${isP?'-':'+'}${fr(Math.abs(or||0))}</span>
+          <span class="${isP?'up':'down'} mono">${or!==null?(isP?'-':'+')+fr(Math.abs(or||0)):'—'}</span>
         </div></td>
       </tr>`;
     }).join('');
   }
-  document.getElementById('cashOpenBody').innerHTML=openRows(cashO);
-  document.getElementById('foOpenBody').innerHTML=openRows(foO);
+  const cashRisk=(window._D&&window._D.open_risk&&window._D.open_risk.cash)||[];
+  const foRisk=(window._D&&window._D.open_risk&&window._D.open_risk.derivatives)||[];
+  document.getElementById('cashOpenBody').innerHTML=openRows(cashO,cashRisk);
+  document.getElementById('foOpenBody').innerHTML=openRows(foO,foRisk);
 }
 
 // ── ANALYTICS ──────────────────────────────────────────────────
