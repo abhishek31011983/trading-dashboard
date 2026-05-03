@@ -57,14 +57,12 @@ img,svg{display:block;}
 button{cursor:pointer;background:none;border:none;font:inherit;color:inherit;}
 table{border-collapse:collapse;width:100%;}
 :focus-visible{outline:2px solid var(--primary);outline-offset:3px;border-radius:var(--radius-sm);}
-
 /* ── LAYOUT ─────────────────────────────────────────────── */
 .app{display:grid;grid-template-columns:220px 1fr;grid-template-rows:56px 1fr;min-height:100dvh;}
 .topbar{grid-column:1/-1;display:flex;align-items:center;gap:var(--space-4);padding:0 var(--space-6);background:var(--surface);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
 .sidebar{background:var(--surface);border-right:1px solid var(--border);padding:var(--space-4) var(--space-3);display:flex;flex-direction:column;gap:var(--space-1);position:sticky;top:56px;height:calc(100dvh - 56px);overflow-y:auto;}
 .main{padding:var(--space-6);overflow-x:hidden;}
 .page{display:none;}.page.active{display:block;}
-
 /* ── TOPBAR ─────────────────────────────────────────────── */
 .logo{display:flex;align-items:center;gap:var(--space-2);font-weight:700;font-size:var(--text-sm);letter-spacing:-.01em;}
 .logo-icon{color:var(--primary);}
@@ -74,14 +72,12 @@ table{border-collapse:collapse;width:100%;}
 .theme-btn:hover{background:var(--surface-off);color:var(--text);}
 .refresh-btn{display:flex;align-items:center;gap:4px;padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-xs);font-weight:500;background:var(--primary-hl);color:var(--primary);border:1px solid rgba(59,130,246,.2);transition:background var(--transition);}
 .refresh-btn:hover{background:var(--primary);color:#fff;}
-
 /* ── SIDEBAR ─────────────────────────────────────────────── */
 .nav-label{font-size:var(--text-xs);font-weight:600;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;padding:var(--space-3) var(--space-3) var(--space-1);}
 .nav-btn{display:flex;align-items:center;gap:var(--space-3);width:100%;padding:var(--space-2) var(--space-3);border-radius:var(--radius-md);font-size:var(--text-sm);font-weight:500;color:var(--muted);transition:background var(--transition),color var(--transition);}
 .nav-btn:hover{background:var(--surface-off);color:var(--text);}
 .nav-btn.active{background:rgba(59,130,246,.15);color:var(--primary);}
 .nav-icon{width:16px;height:16px;flex-shrink:0;}
-
 /* ── SEGMENT TABS ─────────────────────────────────────────── */
 .seg-tabs{display:flex;gap:var(--space-2);margin-bottom:var(--space-5);}
 .seg-tab{display:flex;align-items:center;gap:var(--space-2);padding:var(--space-2) var(--space-4);border-radius:var(--radius-md);font-size:var(--text-xs);font-weight:600;border:1px solid var(--border);cursor:pointer;transition:all var(--transition);background:var(--surface);color:var(--muted);}
@@ -91,7 +87,6 @@ table{border-collapse:collapse;width:100%;}
 .seg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
 .dot-cash{background:var(--cash-color);}
 .dot-fo{background:var(--fo-color);}
-
 /* ── KPI PANELS ─────────────────────────────────────────── */
 .kpi-panels{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4);margin-bottom:var(--space-6);}
 .kpi-panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-5);box-shadow:var(--sh-sm);}
@@ -109,7 +104,6 @@ table{border-collapse:collapse;width:100%;}
 .up{color:var(--success)!important;}
 .down{color:var(--error)!important;}
 .neutral{color:var(--muted)!important;}
-
 /* ── CARDS & CHARTS ─────────────────────────────────────── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--sh-sm);}
 .card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-4);}
@@ -121,7 +115,6 @@ table{border-collapse:collapse;width:100%;}
 .split-chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:var(--space-5);box-shadow:var(--sh-sm);}
 .split-chart-card.cash-card{border-top:2px solid var(--cash-color);}
 .split-chart-card.fo-card{border-top:2px solid var(--fo-color);}
-
 /* ── TABLE ──────────────────────────────────────────────── */
 .tbl-wrap{overflow-x:auto;}
 table.t{font-size:var(--text-xs);font-variant-numeric:tabular-nums;}
@@ -131,7 +124,6 @@ table.t tbody tr{border-bottom:1px solid var(--divider);transition:background va
 table.t tbody tr:hover{background:var(--surface-off);}
 table.t tbody td{padding:var(--space-2) var(--space-3);white-space:nowrap;vertical-align:middle;}
 table.t tbody tr:last-child{border-bottom:none;}
-
 /* ── BADGES ─────────────────────────────────────────────── */
 .badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:var(--radius-full);font-size:var(--text-xs);font-weight:600;white-space:nowrap;}
 .b-open{background:rgba(59,130,246,.15);color:var(--primary);}
@@ -140,32 +132,27 @@ table.t tbody tr:last-child{border-bottom:none;}
 .b-short{background:rgba(244,63,94,.15);color:var(--error);}
 .b-cash{background:var(--cash-bg);color:var(--cash-color);}
 .b-fo{background:var(--fo-bg);color:var(--fo-color);}
-
 /* ── FILTERS ─────────────────────────────────────────────── */
 .filters{display:flex;gap:var(--space-2);flex-wrap:wrap;margin-bottom:var(--space-4);}
 .fsel{padding:6px 12px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--surface-off);color:var(--text);font-size:var(--text-xs);font-family:var(--font-body);}
 .fsel:focus{outline:none;border-color:var(--primary);}
 .finput{padding:6px 12px;border-radius:var(--radius-md);border:1px solid var(--border);background:var(--surface-off);color:var(--text);font-size:var(--text-xs);font-family:var(--font-body);width:180px;}
 .finput:focus{outline:none;border-color:var(--primary);}
-
 /* ── RISK BARS ───────────────────────────────────────────── */
 .rbar-cell{display:flex;align-items:center;gap:var(--space-2);}
 .rbar{height:6px;border-radius:var(--radius-full);min-width:4px;}
 .rbar.pos{background:var(--success);}
 .rbar.neg{background:var(--error);}
-
 /* ── PAGE HEADER ─────────────────────────────────────────── */
 .ph{margin-bottom:var(--space-6);}
 .ph h1{font-size:var(--text-xl);font-weight:700;letter-spacing:-.02em;line-height:1.1;}
 .ph p{font-size:var(--text-sm);color:var(--muted);margin-top:var(--space-1);}
 .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums;}
-
 /* ── TOP LIST ────────────────────────────────────────────── */
 .top-row{display:flex;align-items:center;justify-content:space-between;padding:var(--space-2) 0;border-bottom:1px solid var(--divider);}
 .top-row:last-child{border-bottom:none;}
 .top-name{font-weight:600;}
 .top-seg{color:var(--muted);font-size:var(--text-xs);}
-
 /* ── MOBILE ──────────────────────────────────────────────── */
 @media(max-width:768px){
   .app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr;}
@@ -179,226 +166,335 @@ table.t tbody tr:last-child{border-bottom:none;}
 </head>
 <body>
 <div class="app">
-
-<!-- TOPBAR -->
-<header class="topbar">
-  <div class="logo">
-    <svg class="logo-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/>
-    </svg>
-    Trading Pro
+  <div class="topbar">
+    <div class="logo">
+      <svg class="logo-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+      <span>Trading Pro</span>
+    </div>
+    <div class="spacer"></div>
+    <div class="last-upd" id="lastUpd">Loading…</div>
+    <button class="refresh-btn" onclick="loadData()">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+      Refresh
+    </button>
+    <button id="themeBtn" class="theme-btn" aria-label="Toggle theme">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+    </button>
   </div>
-  <div class="spacer"></div>
-  <div class="last-upd" id="lastUpd">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    Loading…
+
+  <div class="sidebar">
+    <div class="nav-label">Views</div>
+    <button class="nav-btn active" id="btn-overview" onclick="go('overview')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Overview
+    </button>
+    <button class="nav-btn" id="btn-journal" onclick="go('journal')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      Trade Journal
+    </button>
+    <button class="nav-btn" id="btn-openrisk" onclick="go('openrisk')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
+      Open Risk
+    </button>
+    <button class="nav-btn" id="btn-analytics" onclick="go('analytics')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
+      Analytics
+    </button>
   </div>
-  <button class="refresh-btn" onclick="loadData()">
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
-    Refresh
-  </button>
-  <button class="theme-btn" id="themeBtn" aria-label="Toggle theme">
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-  </button>
-</header>
 
-<!-- SIDEBAR -->
-<aside class="sidebar">
-  <span class="nav-label">Views</span>
-  <button class="nav-btn active" id="btn-overview" onclick="go('overview')">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Overview
-  </button>
-  <button class="nav-btn" id="btn-journal" onclick="go('journal')">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Trade Journal
-  </button>
-  <button class="nav-btn" id="btn-openrisk" onclick="go('openrisk')">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>Open Risk
-  </button>
-  <button class="nav-btn" id="btn-analytics" onclick="go('analytics')">
-    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics
-  </button>
-</aside>
-
-<!-- MAIN -->
-<main class="main">
-
-<!-- ══ OVERVIEW ══ -->
-<div class="page active" id="overview">
-  <div class="ph"><h1>Overview</h1><p id="ovSub">Loading…</p></div>
-
-  <div class="kpi-panels">
-    <!-- Cash Panel -->
-    <div class="kpi-panel cash-panel">
-      <div class="kpi-panel-header">
-        <div class="seg-dot dot-cash"></div>
-        <span class="kpi-panel-title">Cash Trades</span>
+  <div class="main">
+    <div class="page active" id="overview">
+      <div class="ph">
+        <h1>Overview</h1>
+        <p id="ovSub">Loading…</p>
       </div>
-      <div class="kpi-row">
-        <div class="kpi"><div class="kpi-lbl">Net P&L</div><div class="kpi-val" id="c-pnl">—</div><div class="kpi-sub" id="c-pnl-sub">—</div></div>
-        <div class="kpi"><div class="kpi-lbl">Win Rate</div><div class="kpi-val" id="c-wr">—</div><div class="kpi-sub" id="c-wr-sub">—</div></div>
-        <div class="kpi"><div class="kpi-lbl">Profit Factor</div><div class="kpi-val" id="c-pf">—</div><div class="kpi-sub">Gross P / L</div></div>
-        <div class="kpi"><div class="kpi-lbl">Open Risk</div><div class="kpi-val" id="c-or">—</div><div class="kpi-sub">Open positions</div></div>
-        <div class="kpi"><div class="kpi-lbl">Total Trades</div><div class="kpi-val" id="c-tt">—</div><div class="kpi-sub" id="c-tt-sub">—</div></div>
-        <div class="kpi"><div class="kpi-lbl">Avg RR</div><div class="kpi-val" id="c-rr">—</div><div class="kpi-sub">Winners only</div></div>
+
+      <div class="kpi-panels">
+        <div class="kpi-panel cash-panel">
+          <div class="kpi-panel-header">
+            <div class="seg-dot dot-cash"></div>
+            <div class="kpi-panel-title">Cash Trades</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi">
+              <div class="kpi-lbl">Net P&L</div>
+              <div class="kpi-val" id="c-pnl">—</div>
+              <div class="kpi-sub" id="c-pnl-sub">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Win Rate</div>
+              <div class="kpi-val" id="c-wr">—</div>
+              <div class="kpi-sub" id="c-wr-sub">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Profit Factor</div>
+              <div class="kpi-val" id="c-pf">—</div>
+              <div class="kpi-sub">Gross P / L</div>
+            </div>
+          </div>
+          <div class="kpi-row" style="margin-top:var(--space-3)">
+            <div class="kpi">
+              <div class="kpi-lbl">Open Risk</div>
+              <div class="kpi-val" id="c-or">—</div>
+              <div class="kpi-sub">Open positions</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Total Trades</div>
+              <div class="kpi-val" id="c-tt">—</div>
+              <div class="kpi-sub" id="c-tt-sub">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Avg RR</div>
+              <div class="kpi-val" id="c-rr">—</div>
+              <div class="kpi-sub">Winners only</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-panel fo-panel">
+          <div class="kpi-panel-header">
+            <div class="seg-dot dot-fo"></div>
+            <div class="kpi-panel-title">Futures / Options</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi">
+              <div class="kpi-lbl">Net P&L</div>
+              <div class="kpi-val" id="f-pnl">—</div>
+              <div class="kpi-sub" id="f-pnl-sub">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Win Rate</div>
+              <div class="kpi-val" id="f-wr">—</div>
+              <div class="kpi-sub" id="f-wr-sub">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Profit Factor</div>
+              <div class="kpi-val" id="f-pf">—</div>
+              <div class="kpi-sub">Gross P / L</div>
+            </div>
+          </div>
+          <div class="kpi-row" style="margin-top:var(--space-3)">
+            <div class="kpi">
+              <div class="kpi-lbl">Open Risk</div>
+              <div class="kpi-val" id="f-or">—</div>
+              <div class="kpi-sub">Open positions</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Total Trades</div>
+              <div class="kpi-val" id="f-tt">—</div>
+              <div class="kpi-sub" id="f-tt-sub">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Avg RR</div>
+              <div class="kpi-val" id="f-rr">—</div>
+              <div class="kpi-sub">Winners only</div>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    <!-- F&O Panel -->
-    <div class="kpi-panel fo-panel">
-      <div class="kpi-panel-header">
-        <div class="seg-dot dot-fo"></div>
-        <span class="kpi-panel-title">Futures / Options</span>
+
+      <div class="charts-grid">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">● Cash — Equity Curve</div>
+          </div>
+          <div class="chart-wrap"><canvas id="eq-cash"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">● F&O — Equity Curve</div>
+          </div>
+          <div class="chart-wrap"><canvas id="eq-fo"></canvas></div>
+        </div>
       </div>
-      <div class="kpi-row">
-        <div class="kpi"><div class="kpi-lbl">Net P&L</div><div class="kpi-val" id="f-pnl">—</div><div class="kpi-sub" id="f-pnl-sub">—</div></div>
-        <div class="kpi"><div class="kpi-lbl">Win Rate</div><div class="kpi-val" id="f-wr">—</div><div class="kpi-sub" id="f-wr-sub">—</div></div>
-        <div class="kpi"><div class="kpi-lbl">Profit Factor</div><div class="kpi-val" id="f-pf">—</div><div class="kpi-sub">Gross P / L</div></div>
-        <div class="kpi"><div class="kpi-lbl">Open Risk</div><div class="kpi-val" id="f-or">—</div><div class="kpi-sub">Open positions</div></div>
-        <div class="kpi"><div class="kpi-lbl">Total Trades</div><div class="kpi-val" id="f-tt">—</div><div class="kpi-sub" id="f-tt-sub">—</div></div>
-        <div class="kpi"><div class="kpi-lbl">Avg RR</div><div class="kpi-val" id="f-rr">—</div><div class="kpi-sub">Winners only</div></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- Equity curves side by side -->
-  <div class="split-chart-grid" style="margin-bottom:var(--space-4)">
-    <div class="split-chart-card cash-card">
-      <div class="card-hdr"><span class="card-title" style="color:var(--cash-color)">● Cash — Equity Curve</span></div>
-      <div class="chart-wrap"><canvas id="eq-cash"></canvas></div>
-    </div>
-    <div class="split-chart-card fo-card">
-      <div class="card-hdr"><span class="card-title" style="color:var(--fo-color)">● F&O — Equity Curve</span></div>
-      <div class="chart-wrap"><canvas id="eq-fo"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Monthly combined -->
-  <div class="card">
-    <div class="card-hdr"><span class="card-title">Monthly P&L — Cash vs F&O</span></div>
-    <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
-  </div>
-</div>
-
-<!-- ══ JOURNAL ══ -->
-<div class="page" id="journal">
-  <div class="ph"><h1>Trade Journal</h1><p>Filter by instrument, status, type, or segment</p></div>
-  <div class="card">
-    <div class="filters">
-      <select class="fsel" id="jInstr" onchange="renderJ()">
-        <option value="">All Instruments</option>
-        <option value="Cash">Cash</option>
-        <option value="Futures/Options">Futures / Options</option>
-      </select>
-      <select class="fsel" id="jStatus" onchange="renderJ()"><option value="">All Status</option><option>Open</option><option>Closed</option></select>
-      <select class="fsel" id="jType" onchange="renderJ()"><option value="">All Types</option><option>Long</option><option>Short</option></select>
-      <select class="fsel" id="jSeg" onchange="renderJ()"><option value="">All Segments</option></select>
-      <input class="finput" type="text" id="jSearch" placeholder="Search by name…" oninput="renderJ()">
-    </div>
-    <div class="tbl-wrap">
-      <table class="t">
-        <thead><tr>
-          <th>Instr</th><th>Status</th><th>Date</th><th>Name</th><th>Type</th><th>Segment</th>
-          <th>Shares</th><th>Entry ₹</th><th>SL ₹</th><th>TSL ₹</th>
-          <th>Exit ₹</th><th>P&L ₹</th><th>RR</th>
-        </tr></thead>
-        <tbody id="jBody"></tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<!-- ══ OPEN RISK ══ -->
-<div class="page" id="openrisk">
-  <div class="ph"><h1>Open Risk Monitor</h1><p>Live open positions by instrument type</p></div>
-
-  <div class="kpi-panels" style="margin-bottom:var(--space-4)">
-    <div class="kpi-panel cash-panel">
-      <div class="kpi-panel-header"><div class="seg-dot dot-cash"></div><span class="kpi-panel-title">Cash — Open Positions</span></div>
-      <div class="kpi-row">
-        <div class="kpi"><div class="kpi-lbl">Total Open Risk</div><div class="kpi-val" id="co-risk">—</div><div class="kpi-sub">All cash positions</div></div>
-        <div class="kpi"><div class="kpi-lbl">Positions</div><div class="kpi-val" id="co-count">—</div><div class="kpi-sub" id="co-detail">—</div></div>
-        <div class="kpi"><div class="kpi-lbl">Protected (TSL)</div><div class="kpi-val up" id="co-prot">—</div><div class="kpi-sub">TSL above entry</div></div>
-      </div>
-    </div>
-    <div class="kpi-panel fo-panel">
-      <div class="kpi-panel-header"><div class="seg-dot dot-fo"></div><span class="kpi-panel-title">F&O — Open Positions</span></div>
-      <div class="kpi-row">
-        <div class="kpi"><div class="kpi-lbl">Total Open Risk</div><div class="kpi-val" id="fo-risk">—</div><div class="kpi-sub">All F&O positions</div></div>
-        <div class="kpi"><div class="kpi-lbl">Positions</div><div class="kpi-val" id="fo-count">—</div><div class="kpi-sub" id="fo-detail">—</div></div>
-        <div class="kpi"><div class="kpi-lbl">Protected (TSL)</div><div class="kpi-val up" id="fo-prot">—</div><div class="kpi-sub">TSL above entry</div></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="split-chart-grid">
-    <div class="split-chart-card cash-card">
-      <div class="card-hdr"><span class="card-title" style="color:var(--cash-color)">Cash Open Positions</span></div>
-      <div class="tbl-wrap">
-        <table class="t">
-          <thead><tr><th>Name</th><th>Segment</th><th>Shares</th><th>TSL ₹</th><th>Total Open Risk</th></tr></thead>
-          <tbody id="cashOpenBody"></tbody>
-        </table>
+      <div class="card full">
+        <div class="card-hdr">
+          <div class="card-title">Monthly P&L — Cash vs F&O</div>
+        </div>
+        <div class="chart-wrap"><canvas id="monthlyChart"></canvas></div>
       </div>
     </div>
-    <div class="split-chart-card fo-card">
-      <div class="card-hdr"><span class="card-title" style="color:var(--fo-color)">F&O Open Positions</span></div>
-      <div class="tbl-wrap">
-        <table class="t">
-          <thead><tr><th>Name</th><th>Segment</th><th>Shares</th><th>TSL ₹</th><th>Total Open Risk</th></tr></thead>
-          <tbody id="foOpenBody"></tbody>
-        </table>
+
+    <div class="page" id="journal">
+      <div class="ph">
+        <h1>Trade Journal</h1>
+        <p>Filter by instrument, status, type, or segment</p>
+      </div>
+      <div class="filters">
+        <select class="fsel" id="jInstr" onchange="renderJ()">
+          <option value="">All Instruments</option>
+          <option value="Cash">Cash</option>
+          <option value="Futures/Options">Futures / Options</option>
+        </select>
+        <select class="fsel" id="jStatus" onchange="renderJ()">
+          <option value="">All Status</option><option>Open</option><option>Closed</option>
+        </select>
+        <select class="fsel" id="jType" onchange="renderJ()">
+          <option value="">All Types</option><option>Long</option><option>Short</option>
+        </select>
+        <select class="fsel" id="jSeg" onchange="renderJ()">
+          <option value="">All Segments</option>
+        </select>
+        <input class="finput" type="text" id="jSearch" placeholder="Search by name…" oninput="renderJ()">
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead>
+              <tr>
+                <th>Instr</th><th>Status</th><th>Date</th><th>Name</th><th>Type</th><th>Segment</th><th>Shares</th><th>Entry ₹</th><th>SL ₹</th><th>TSL ₹</th><th>Exit ₹</th><th>P&L ₹</th><th>RR</th>
+              </tr>
+            </thead>
+            <tbody id="jBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="openrisk">
+      <div class="ph">
+        <h1>Open Risk Monitor</h1>
+        <p>Live open positions by instrument type</p>
+      </div>
+
+      <div class="kpi-panels">
+        <div class="kpi-panel cash-panel">
+          <div class="kpi-panel-header">
+            <div class="seg-dot dot-cash"></div>
+            <div class="kpi-panel-title">Cash — Open Positions</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi">
+              <div class="kpi-lbl">Total Open Risk</div>
+              <div class="kpi-val" id="co-risk">—</div>
+              <div class="kpi-sub">All cash positions</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Positions</div>
+              <div class="kpi-val" id="co-count">—</div>
+              <div class="kpi-sub" id="co-detail">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Protected (TSL)</div>
+              <div class="kpi-val" id="co-prot">—</div>
+              <div class="kpi-sub">TSL above entry</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="kpi-panel fo-panel">
+          <div class="kpi-panel-header">
+            <div class="seg-dot dot-fo"></div>
+            <div class="kpi-panel-title">F&O — Open Positions</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi">
+              <div class="kpi-lbl">Total Open Risk</div>
+              <div class="kpi-val" id="fo-risk">—</div>
+              <div class="kpi-sub">All F&O positions</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Positions</div>
+              <div class="kpi-val" id="fo-count">—</div>
+              <div class="kpi-sub" id="fo-detail">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Protected (TSL)</div>
+              <div class="kpi-val" id="fo-prot">—</div>
+              <div class="kpi-sub">TSL above entry</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">Cash Open Positions</div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead>
+              <tr><th>Name</th><th>Segment</th><th>Shares</th><th>TSL ₹</th><th>Total Open Risk</th></tr>
+            </thead>
+            <tbody id="cashOpenBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:var(--space-4)">
+        <div class="card-hdr">
+          <div class="card-title">F&O Open Positions</div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead>
+              <tr><th>Name</th><th>Segment</th><th>Shares</th><th>TSL ₹</th><th>Total Open Risk</th></tr>
+            </thead>
+            <tbody id="foOpenBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="page" id="analytics">
+      <div class="ph">
+        <h1>Analytics</h1>
+        <p>Performance breakdown — Cash vs F&O</p>
+      </div>
+
+      <div class="split-chart-grid">
+        <div class="split-chart-card cash-card">
+          <div class="card-hdr">
+            <div class="card-title">Cash — Win/Loss</div>
+          </div>
+          <div class="chart-wrap"><canvas id="wl-cash"></canvas></div>
+        </div>
+        <div class="split-chart-card fo-card">
+          <div class="card-hdr">
+            <div class="card-title">F&O — Win/Loss</div>
+          </div>
+          <div class="chart-wrap"><canvas id="wl-fo"></canvas></div>
+        </div>
+      </div>
+
+      <div class="split-chart-grid" style="margin-top:var(--space-4)">
+        <div class="split-chart-card cash-card">
+          <div class="card-hdr">
+            <div class="card-title">Cash — RR Distribution</div>
+          </div>
+          <div class="chart-wrap"><canvas id="rr-cash"></canvas></div>
+        </div>
+        <div class="split-chart-card fo-card">
+          <div class="card-hdr">
+            <div class="card-title">F&O — RR Distribution</div>
+          </div>
+          <div class="chart-wrap"><canvas id="rr-fo"></canvas></div>
+        </div>
+      </div>
+
+      <div class="split-chart-grid" style="margin-top:var(--space-4)">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">Cash — Top 5 Winners / Losers</div>
+          </div>
+          <div style="font-size:var(--text-xs);font-weight:600;color:var(--muted);margin-bottom:var(--space-2)">WINNERS</div>
+          <div id="cWin"></div>
+          <div style="font-size:var(--text-xs);font-weight:600;color:var(--muted);margin:var(--space-4) 0 var(--space-2)">LOSERS</div>
+          <div id="cLoss"></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">F&O — Top 5 Winners / Losers</div>
+          </div>
+          <div style="font-size:var(--text-xs);font-weight:600;color:var(--muted);margin-bottom:var(--space-2)">WINNERS</div>
+          <div id="fWin"></div>
+          <div style="font-size:var(--text-xs);font-weight:600;color:var(--muted);margin:var(--space-4) 0 var(--space-2)">LOSERS</div>
+          <div id="fLoss"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-<!-- ══ ANALYTICS ══ -->
-<div class="page" id="analytics">
-  <div class="ph"><h1>Analytics</h1><p>Performance breakdown — Cash vs F&O</p></div>
-
-  <!-- Win/Loss side by side -->
-  <div class="split-chart-grid" style="margin-bottom:var(--space-4)">
-    <div class="split-chart-card cash-card">
-      <div class="card-hdr"><span class="card-title" style="color:var(--cash-color)">Cash — Win/Loss</span></div>
-      <div class="chart-wrap"><canvas id="wl-cash"></canvas></div>
-    </div>
-    <div class="split-chart-card fo-card">
-      <div class="card-hdr"><span class="card-title" style="color:var(--fo-color)">F&O — Win/Loss</span></div>
-      <div class="chart-wrap"><canvas id="wl-fo"></canvas></div>
-    </div>
-  </div>
-
-  <!-- RR distributions side by side -->
-  <div class="split-chart-grid" style="margin-bottom:var(--space-4)">
-    <div class="split-chart-card cash-card">
-      <div class="card-hdr"><span class="card-title" style="color:var(--cash-color)">Cash — RR Distribution</span></div>
-      <div class="chart-wrap"><canvas id="rr-cash"></canvas></div>
-    </div>
-    <div class="split-chart-card fo-card">
-      <div class="card-hdr"><span class="card-title" style="color:var(--fo-color)">F&O — RR Distribution</span></div>
-      <div class="chart-wrap"><canvas id="rr-fo"></canvas></div>
-    </div>
-  </div>
-
-  <!-- Top performers -->
-  <div class="split-chart-grid">
-    <div class="split-chart-card cash-card">
-      <div class="card-hdr"><span class="card-title" style="color:var(--cash-color)">Cash — Top 5 Winners / Losers</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
-        <div><div style="font-size:var(--text-xs);font-weight:700;color:var(--success);margin-bottom:var(--space-2)">WINNERS</div><div id="cWin"></div></div>
-        <div><div style="font-size:var(--text-xs);font-weight:700;color:var(--error);margin-bottom:var(--space-2)">LOSERS</div><div id="cLoss"></div></div>
-      </div>
-    </div>
-    <div class="split-chart-card fo-card">
-      <div class="card-hdr"><span class="card-title" style="color:var(--fo-color)">F&O — Top 5 Winners / Losers</span></div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
-        <div><div style="font-size:var(--text-xs);font-weight:700;color:var(--success);margin-bottom:var(--space-2)">WINNERS</div><div id="fWin"></div></div>
-        <div><div style="font-size:var(--text-xs);font-weight:700;color:var(--error);margin-bottom:var(--space-2)">LOSERS</div><div id="fLoss"></div></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-</main>
 </div>
 
 <script>
@@ -413,6 +509,7 @@ function pn(v) {
   if (isNaN(n)) return null;
   return s.includes('(') ? -n : n;
 }
+
 function fr(n, sign=false) {
   if (n === null || n === undefined) return '—';
   const a = Math.abs(n);
@@ -420,31 +517,40 @@ function fr(n, sign=false) {
   if (sign) return (n<0?'-':'+')+s;
   return (n<0?'-':'')+s;
 }
-function fn(n,d=2){ return n === null ? '—' : n.toFixed(d); }
+
+function fn(n,d=2){
+  return n === null ? '—' : n.toFixed(d);
+}
 
 function calcMetrics(trades) {
   const closed = trades.filter(t => t.status==='Closed');
-  const open   = trades.filter(t => t.status==='Open');
+  const open = trades.filter(t => t.status==='Open');
   let pnl=0, wins=0, gw=0, gl=0;
   closed.forEach(t => {
-    const pl = pn(t.pl_per_share);
-    if (pl !== null) { pnl += pl; if(pl>0){wins++;gw+=pl;}else gl+=Math.abs(pl); }
+    const pl = pn(t.total_pl);
+    if (pl !== null) {
+      pnl += pl;
+      if(pl>0){wins++;gw+=pl;}else gl+=Math.abs(pl);
+    }
   });
   const wr = closed.length ? ((wins/closed.length)*100).toFixed(1) : '0';
   const pf = gl>0 ? (gw/gl).toFixed(2) : wins>0?'∞':'0';
   let sumRR=0, rrC=0;
-  closed.filter(t=>pn(t.pl_per_share)>0).forEach(t => {
-    const risk=pn(t.total_risk), pl=pn(t.pl_per_share);
+  closed.filter(t=>pn(t.total_pl)>0).forEach(t => {
+    const risk=pn(t.total_risk), pl=pn(t.total_pl);
     if(risk&&risk>0&&pl){sumRR+=pl/risk;rrC++;}
   });
   const avgRR = rrC ? (sumRR/rrC).toFixed(2) : '—';
   let openRisk=0;
-  open.forEach(t=>{ const r=pn(t.total_risk); if(r!==null) openRisk+=r; });
-  const prot = open.filter(t=>pn(t.total_risk)!==null&&pn(t.total_risk)<=0).length;
+  open.forEach(t=>{
+    const r=pn(t.total_open_risk);
+    if(r!==null) openRisk+=r;
+  });
+  const prot = open.filter(t=>pn(t.total_open_risk)!==null&&pn(t.total_open_risk)<=0).length;
   return { pnl, wins, wr, pf, avgRR, openRisk, total:trades.length, closedN:closed.length, openN:open.length, prot };
 }
 
-// ── THEME ──────────────────────────────────────────────────
+// ── THEME ────────────────────────────────────────────────────
 (function(){
   const btn=document.getElementById('themeBtn'), r=document.documentElement;
   r.setAttribute('data-theme','dark');
@@ -458,7 +564,7 @@ function calcMetrics(trades) {
   });
 })();
 
-// ── NAV ────────────────────────────────────────────────────
+// ── NAV ────────────────────────────────────────────────────────
 function go(name){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -469,7 +575,7 @@ function go(name){
   if(name==='analytics') renderAnalytics();
 }
 
-// ── LOAD ───────────────────────────────────────────────────
+// ── LOAD ───────────────────────────────────────────────────────
 async function loadData(){
   try{
     const r=await fetch(`data.json?v=${Date.now()}`,{cache:'no-store'});
@@ -489,7 +595,7 @@ async function loadData(){
   }
 }
 
-// ── OVERVIEW ───────────────────────────────────────────────
+// ── OVERVIEW ───────────────────────────────────────────────────
 function setKPI(pfx, m) {
   const pnlEl=document.getElementById(pfx+'-pnl');
   pnlEl.textContent=fr(m.pnl, true);
@@ -516,7 +622,7 @@ function renderOverview(){
   renderAllCharts();
 }
 
-// ── CHARTS ─────────────────────────────────────────────────
+// ── CHARTS ─────────────────────────────────────────────────────
 const isDark=()=>document.documentElement.getAttribute('data-theme')==='dark';
 const gc=()=>isDark()?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
 const tc=()=>isDark()?'#7a8aaa':'#64748b';
@@ -524,29 +630,34 @@ const CASH_C='#3b82f6', FO_C='#a78bfa';
 const WIN_C_D='rgba(34,197,94,0.85)', LOSS_C_D='rgba(244,63,94,0.85)';
 const WIN_C_L='rgba(22,163,74,0.85)', LOSS_C_L='rgba(225,29,72,0.85)';
 
-function dc(id){ if(CI[id]){CI[id].destroy();delete CI[id];} }
+function dc(id){
+  if(CI[id]){CI[id].destroy();delete CI[id];}
+}
 
 function renderAllCharts(){
   Chart.defaults.color=tc();
   Chart.defaults.borderColor=gc();
   Chart.defaults.font.family="'Inter',sans-serif";
   Chart.defaults.font.size=11;
-
   const dark=isDark();
   const cash=T.filter(t=>t.instrument==='Cash');
-  const fo  =T.filter(t=>t.instrument==='Futures/Options');
-
+  const fo =T.filter(t=>t.instrument==='Futures/Options');
   renderEquity('eq-cash', cash, CASH_C, dark);
-  renderEquity('eq-fo',   fo,   FO_C,   dark);
+  renderEquity('eq-fo', fo, FO_C, dark);
   renderMonthly(cash, fo, dark);
 }
 
 function renderEquity(id, trades, color, dark){
   dc(id);
-  const closed=trades.filter(t=>t.status==='Closed'&&pn(t.pl_per_share)!==null)
+  const closed=trades.filter(t=>t.status==='Closed'&&pn(t.total_pl)!==null)
     .sort((a,b)=>new Date(a.entry_date)-new Date(b.entry_date));
-  let cum=0; const labels=[], vals=[];
-  closed.forEach((t,i)=>{ cum+=pn(t.pl_per_share)||0; labels.push(t.name+(i+1)); vals.push(cum); });
+  let cum=0;
+  const labels=[], vals=[];
+  closed.forEach((t,i)=>{
+    cum+=pn(t.total_pl)||0;
+    labels.push(t.name+(i+1));
+    vals.push(cum);
+  });
   const bg=dark?`${color}18`:`${color}15`;
   CI[id]=new Chart(document.getElementById(id),{
     type:'line',
@@ -558,7 +669,8 @@ function renderEquity(id, trades, color, dark){
       scales:{
         x:{grid:{display:false},ticks:{display:false}},
         y:{grid:{color:gc()},ticks:{color:tc(),callback:v=>'₹'+(Math.abs(v)>=1e3?(v/1e3).toFixed(1)+'K':v)}}
-      }}
+      }
+    }
   });
 }
 
@@ -572,7 +684,7 @@ function renderMonthly(cash, fo, dark){
       if(isNaN(d)) return;
       const key=`${d.toLocaleString('en-IN',{month:'short'})}-${String(d.getFullYear()).slice(-2)}`;
       if(!byMonth[key]) byMonth[key]={cash:0,fo:0};
-      const pl=pn(t.pl_per_share)||0;
+      const pl=pn(t.total_pl)||0;
       if(t._type==='cash') byMonth[key].cash+=pl;
       else byMonth[key].fo+=pl;
     });
@@ -590,11 +702,12 @@ function renderMonthly(cash, fo, dark){
       scales:{
         x:{grid:{color:gc()},ticks:{color:tc()}},
         y:{grid:{color:gc()},ticks:{color:tc(),callback:v=>'₹'+(Math.abs(v)>=1e3?(v/1e3).toFixed(1)+'K':v)}}
-      }}
+      }
+    }
   });
 }
 
-// ── JOURNAL ─────────────────────────────────────────────────
+// ── JOURNAL ────────────────────────────────────────────────────
 function renderJ(){
   const segs=[...new Set(T.map(t=>t.segment).filter(Boolean))].sort();
   const sel=document.getElementById('jSeg');
@@ -608,18 +721,19 @@ function renderJ(){
   const q=document.getElementById('jSearch').value.toLowerCase();
 
   const rows=T.filter(t=>
-    (!instr  || t.instrument===instr) &&
+    (!instr || t.instrument===instr) &&
     (!status || t.status===status) &&
-    (!type   || t.type===type) &&
-    (!seg    || t.segment===seg) &&
-    (!q      || (t.name||'').toLowerCase().includes(q))
+    (!type || t.type===type) &&
+    (!seg || t.segment===seg) &&
+    (!q || (t.name||'').toLowerCase().includes(q))
   );
 
   const isFO=t=>t.instrument==='Futures/Options';
   const b=document.getElementById('jBody');
   if(!rows.length){b.innerHTML=`<tr><td colspan="13" style="text-align:center;padding:2rem;color:var(--muted)">No trades match</td></tr>`;return;}
+  
   b.innerHTML=rows.map(t=>{
-    const pl=pn(t.pl_per_share);
+    const pl=pn(t.total_pl);
     const plCls=pl===null?'neutral':pl>0?'up':'down';
     const plStr=pl===null?'—':fr(pl,true);
     const risk=pn(t.total_risk);
@@ -629,13 +743,13 @@ function renderJ(){
       <td><span class="badge ${isFO(t)?'b-fo':'b-cash'}">${isFO(t)?'F&O':'Cash'}</span></td>
       <td><span class="badge ${t.status==='Open'?'b-open':'b-closed'}">${t.status}</span></td>
       <td>${t.entry_date||'—'}</td>
-      <td style="font-weight:600">${g.name}</td>
+      <td style="font-weight:600">${t.name}</td>
       <td><span class="badge ${t.type==='Long'?'b-long':'b-short'}">${t.type||'—'}</span></td>
-      <td>${g.seg||'—'}</td>
-      <td class="mono">${g.sh}</td>
-      ${g.sh}</td >
-      ${g.sh}</td  >
-      <td class="mono">${g.tsl?'₹'+g.tsl:'—'}</td>
+      <td>${t.segment||'—'}</td>
+      <td class="mono">${t.shares||'—'}</td>
+      <td class="mono">${t.entry_price?'₹'+t.entry_price:'—'}</td>
+      <td class="mono">${t.stop_loss?'₹'+t.stop_loss:'—'}</td>
+      <td class="mono">${t.tsl?'₹'+t.tsl:'—'}</td>
       <td class="mono">${t.exit_price?'₹'+t.exit_price:'—'}</td>
       <td class="${plCls} mono">${plStr}</td>
       <td class="${rrCls} mono">${rrStr}</td>
@@ -643,24 +757,25 @@ function renderJ(){
   }).join('');
 }
 
-// ── OPEN RISK ──────────────────────────────────────────────
+// ── OPEN RISK ──────────────────────────────────────────────────
 function renderOpenRisk(){
   const cashO=T.filter(t=>t.status==='Open'&&t.instrument==='Cash');
-  const foO  =T.filter(t=>t.status==='Open'&&t.instrument==='Futures/Options');
+  const foO =T.filter(t=>t.status==='Open'&&t.instrument==='Futures/Options');
 
   function calcOpen(positions){
     let tot=0, prot=0;
-    positions.forEach(t=>{const r=pn(t.open_risk_per_share);if(r!==null){tot+=r;if(r<=0)prot++;}});
+    positions.forEach(t=>{const r=pn(t.total_open_risk);if(r!==null){tot+=r;if(r<=0)prot++;}});
     return {tot,prot};
   }
   const co=calcOpen(cashO), fo=calcOpen(foO);
-  const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.open_risk_per_share)||0)),1);
+  const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.total_open_risk)||0)),1);
 
   document.getElementById('co-risk').textContent=fr(co.tot,true);
   document.getElementById('co-risk').className='kpi-val '+(co.tot<=0?'up':'down');
   document.getElementById('co-count').textContent=cashO.length;
   document.getElementById('co-detail').textContent=`${co.prot} protected · ${cashO.length-co.prot} at risk`;
   document.getElementById('co-prot').textContent=co.prot;
+
   document.getElementById('fo-risk').textContent=fr(fo.tot,true);
   document.getElementById('fo-risk').className='kpi-val '+(fo.tot<=0?'up':'down');
   document.getElementById('fo-count').textContent=foO.length;
@@ -668,8 +783,17 @@ function renderOpenRisk(){
   document.getElementById('fo-prot').textContent=fo.prot;
 
   function openRows(positions){
-    if(!positions.length) return `<tr><td colspan="8" style="text-align:center;padding:1.5rem;color:var(--muted)">No open positions</td></tr>`;
-    const grp={};positions.forEach(t=>{const n=t.name||'?';if(!grp[n])grp[n]={name:n,seg:t.segment,sh:0,tsl:'',or:0};grp[n].sh+=pn(t.shares)||0;const r=pn(t.open_risk_per_share);if(r!==null)grp[n].or+=r;if(t.tsl)grp[n].tsl=t.tsl;});return Object.values(grp).map(g=>{
+    if(!positions.length) return `<tr><td colspan="5" style="text-align:center;padding:1.5rem;color:var(--muted)">No open positions</td></tr>`;
+    const grp={};
+    positions.forEach(t=>{
+      const n=t.name||'?';
+      if(!grp[n])grp[n]={name:n,seg:t.segment,sh:0,tsl:'',or:0};
+      grp[n].sh+=pn(t.shares)||0;
+      const r=pn(t.total_open_risk);
+      if(r!==null)grp[n].or+=r;
+      if(t.tsl)grp[n].tsl=t.tsl;
+    });
+    return Object.values(grp).map(g=>{
       const or=g.or;
       const isP=or<=0;
       const bw=Math.min(80,Math.round((Math.abs(or||0)/maxR)*80));
@@ -677,14 +801,11 @@ function renderOpenRisk(){
         <td style="font-weight:600">${g.name}</td>
         <td>${g.seg||'—'}</td>
         <td class="mono">${g.sh}</td>
-        ${g.sh}</td >
-        ${g.sh}</td  >
         <td class="mono">${g.tsl?'₹'+g.tsl:'—'}</td>
         <td><div class="rbar-cell">
           <div class="rbar ${isP?'pos':'neg'}" style="width:${bw}px"></div>
           <span class="${isP?'up':'down'} mono">${isP?'-':'+'}${fr(Math.abs(or||0))}</span>
         </div></td>
-        ${g.tsl?'₹'+ g.tsl:'—'}</td>
       </tr>`;
     }).join('');
   }
@@ -692,17 +813,17 @@ function renderOpenRisk(){
   document.getElementById('foOpenBody').innerHTML=openRows(foO);
 }
 
-// ── ANALYTICS ─────────────────────────────────────────────
+// ── ANALYTICS ──────────────────────────────────────────────────
 function renderAnalytics(){
   const dark=isDark();
   const wc=dark?WIN_C_D:WIN_C_L, lc=dark?LOSS_C_D:LOSS_C_L;
   const cash=T.filter(t=>t.instrument==='Cash'&&t.status==='Closed');
-  const fo  =T.filter(t=>t.instrument==='Futures/Options'&&t.status==='Closed');
+  const fo =T.filter(t=>t.instrument==='Futures/Options'&&t.status==='Closed');
 
   function wlDonut(id, trades, color){
     dc(id);
     let w=0,l=0;
-    trades.forEach(t=>{const pl=pn(t.pl_per_share);if(pl!==null){if(pl>0)w++;else l++;}});
+    trades.forEach(t=>{const pl=pn(t.total_pl);if(pl!==null){if(pl>0)w++;else l++;}});
     CI[id]=new Chart(document.getElementById(id),{
       type:'doughnut',
       data:{labels:['Wins','Losses'],datasets:[{data:[w,l],
@@ -712,12 +833,12 @@ function renderAnalytics(){
     });
   }
   wlDonut('wl-cash',cash,CASH_C);
-  wlDonut('wl-fo',  fo,  FO_C);
+  wlDonut('wl-fo', fo, FO_C);
 
   function rrBar(id, trades, color){
     dc(id);
     const data=trades.map(t=>{
-      const risk=pn(t.total_risk), pl=pn(t.pl_per_share);
+      const risk=pn(t.total_risk), pl=pn(t.total_pl);
       if(!risk||risk===0||pl===null) return null;
       return {name:t.name, rr:pl/risk};
     }).filter(Boolean);
@@ -730,14 +851,15 @@ function renderAnalytics(){
         scales:{
           x:{grid:{display:false},ticks:{color:tc(),maxRotation:45}},
           y:{grid:{color:gc()},ticks:{color:tc(),callback:v=>v.toFixed(1)+'R'}}
-        }}
+        }
+      }
     });
   }
   rrBar('rr-cash', cash, CASH_C);
-  rrBar('rr-fo',   fo,   FO_C);
+  rrBar('rr-fo', fo, FO_C);
 
   function topList(winEl, lossEl, trades){
-    const sorted=trades.map(t=>({name:t.name,pl:pn(t.pl_per_share),seg:t.segment}))
+    const sorted=trades.map(t=>({name:t.name,pl:pn(t.total_pl),seg:t.segment}))
       .filter(t=>t.pl!==null).sort((a,b)=>b.pl-a.pl);
     const w5=sorted.filter(t=>t.pl>0).slice(0,5);
     const l5=sorted.filter(t=>t.pl<0).slice(-5).reverse();
