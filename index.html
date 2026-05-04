@@ -771,11 +771,14 @@ function renderOpenRisk(d){
   const co=calcOpen(cashO), fo=calcOpen(foO);
   const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.total_open_risk)||0)),1);
 
-  document.getElementById('co-risk').textContent=fr(co.tot,true);
-  document.getElementById('co-risk').className='kpi-val '+(co.tot<=0?'up':'down');
-  document.getElementById('co-count').textContent=cashO.length;
-  document.getElementById('co-detail').textContent=`${co.prot} protected · ${cashO.length-co.prot} at risk`;
-  document.getElementById('co-prot').textContent=co.prot;
+  const cashTot = cashRisk.filter(r => r.stock !== 'Stock Name').reduce((s, r) => s + (parseFloat(String(r.openrisk).replace(/,/g,''))||0), 0);
+  const atRisk = cashRisk.filter(r => r.stock !== 'Stock Name' && (parseFloat(String(r.openrisk).replace(/,/g,''))||0) > 0).length;
+  const guaranteed = cashRisk.filter(r => r.stock !== 'Stock Name' && (parseFloat(String(r.openrisk).replace(/,/g,''))||0) <= 0).length;
+  document.getElementById('co-risk').textContent = fr(cashTot, true);
+  document.getElementById('co-risk').className = 'kpi-val ' + (cashTot > 0 ? 'up' : 'down');
+  document.getElementById('co-count').textContent = atRisk;
+  document.getElementById('co-detail').textContent = 'Total open risk: ' + fr(cashTot);
+  document.getElementById('co-prot').textContent = guaranteed;
 
   document.getElementById('fo-risk').textContent=fr(fo.tot,true);
   document.getElementById('fo-risk').className='kpi-val '+(fo.tot<=0?'up':'down');
