@@ -810,9 +810,7 @@ function renderOpenRisk(d){
     }).join('');
   }
   const _d=d||window._D||{};
-  const _d=d||window._D||{};
   const foRisk=(_d.open_risk&&_d.open_risk.derivatives)||[];
-  const foRisk=(window._D&&window._D.open_risk&&window._D.open_risk.derivatives)||[];
   document.getElementById('cashOpenBody').innerHTML=openRows(cashO,cashRisk);
   document.getElementById('foOpenBody').innerHTML=openRows(foO,foRisk);
 }
