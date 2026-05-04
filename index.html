@@ -777,13 +777,13 @@ function renderOpenRisk(d){
   const atRisk = cashRisk.filter(r => r.stock !== 'Stock Name' && (parseFloat(String(r.open_risk).replace(/,/g,''))||0) > 0).length;
   const guaranteed = cashRisk.filter(r => r.stock !== 'Stock Name' && (parseFloat(String(r.open_risk).replace(/,/g,''))||0) <= 0).length;
   document.getElementById('co-risk').textContent = fr(cashTot, true);
-  document.getElementById('co-risk').className = 'kpi-val ' + (cashTot > 0 ? 'up' : 'down');
+  document.getElementById('co-risk').className = 'kpi-val ' + (cashTot < 0 ? 'up' : 'down');
   document.getElementById('co-count').textContent = atRisk;
   document.getElementById('co-detail').textContent = 'Total open risk: ' + fr(cashTot);
   document.getElementById('co-prot').textContent = guaranteed;
 
   document.getElementById('fo-risk').textContent=fr(fo.tot,true);
-  document.getElementById('fo-risk').className='kpi-val '+(fo.tot<=0?'up':'down');
+  document.getElementById('fo-risk').className='kpi-val '+(fo.tot>=0?'up':'down');
   document.getElementById('fo-count').textContent=foO.length;
   document.getElementById('fo-detail').textContent=`${fo.prot} protected · ${foO.length-fo.prot} at risk`;
   document.getElementById('fo-prot').textContent=fo.prot;
