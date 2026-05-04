@@ -770,7 +770,9 @@ function renderOpenRisk(d){
   }
   const co=calcOpen(cashO), fo=calcOpen(foO);
   const maxR=Math.max(...T.filter(t=>t.status==='Open').map(t=>Math.abs(pn(t.total_open_risk)||0)),1);
-
+  const _d=d||window._D||{};
+  const cashRisk=(_d.open_risk&&_d.open_risk.cash)||[];
+  const foRisk=(_d.open_risk&&_d.open_risk.derivatives)||[];
   const cashTot = cashRisk.filter(r => r.stock !== 'Stock Name').reduce((s, r) => s + (parseFloat(String(r.openrisk).replace(/,/g,''))||0), 0);
   const atRisk = cashRisk.filter(r => r.stock !== 'Stock Name' && (parseFloat(String(r.openrisk).replace(/,/g,''))||0) > 0).length;
   const guaranteed = cashRisk.filter(r => r.stock !== 'Stock Name' && (parseFloat(String(r.openrisk).replace(/,/g,''))||0) <= 0).length;
