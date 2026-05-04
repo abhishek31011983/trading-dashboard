@@ -773,9 +773,9 @@ function renderOpenRisk(d){
   const _d=d||window._D||{};
   const cashRisk=(_d.open_risk&&_d.open_risk.cash)||[];
   const foRisk=(_d.open_risk&&_d.open_risk.derivatives)||[];
-  const cashTot = cashRisk.filter(r => r.stock !== 'Stock Name').reduce((s, r) => s + (parseFloat(String(r.openrisk).replace(/,/g,''))||0), 0);
-  const atRisk = cashRisk.filter(r => r.stock !== 'Stock Name' && (parseFloat(String(r.openrisk).replace(/,/g,''))||0) > 0).length;
-  const guaranteed = cashRisk.filter(r => r.stock !== 'Stock Name' && (parseFloat(String(r.openrisk).replace(/,/g,''))||0) <= 0).length;
+  const cashTot = cashRisk.filter(r => r.stock !== 'Stock Name').reduce((s, r) => s + (parseFloat(String(r.open_risk).replace(/,/g,''))||0), 0);
+  const atRisk = cashRisk.filter(r => r.stock !== 'Stock Name' && (parseFloat(String(r.open_risk).replace(/,/g,''))||0) > 0).length;
+  const guaranteed = cashRisk.filter(r => r.stock !== 'Stock Name' && (parseFloat(String(r.open_risk).replace(/,/g,''))||0) <= 0).length;
   document.getElementById('co-risk').textContent = fr(cashTot, true);
   document.getElementById('co-risk').className = 'kpi-val ' + (cashTot > 0 ? 'up' : 'down');
   document.getElementById('co-count').textContent = atRisk;
