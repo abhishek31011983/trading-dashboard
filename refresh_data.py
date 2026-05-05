@@ -56,14 +56,14 @@ segment_values = dash_tab.col_values(8)[14:21]
 # S=18 risk_on_portfolio
 # T=19 exit_price
 # U=20 exit_date
-# V=21 pl_per_share
-# W=22 total_pl           <- PRIMARY P&L FIELD
-# X=23 entry_charges
-# Y=24 exit_charges
-# Z=25 mtf_interest
-# AA=26 rr_achieved
+# V=21 total_pl
+# W=22 entry_charges          <- PRIMARY P&L FIELD
+# X=23 exit_charges
+# Y=24 mtf_interest    
+# Z=25 rr_achieved
+# AA=26 comments
 # AB=27 comments
-# AC=28 market_conditions
+# AB=27 market_conditions
 
 all_trades_raw = all_trades_tab.get_all_values()
 headers = all_trades_raw[0] if all_trades_raw else []
@@ -92,13 +92,13 @@ for row in all_trades_raw[1:]:
             "exit_price":          row[19] if len(row) > 19 else "",
             "exit_date":           row[20] if len(row) > 20 else "",
             "pl_per_share":        row[21] if len(row) > 21 else "",
-            "total_pl":            row[22] if len(row) > 22 else "",
-            "entry_charges":       row[23] if len(row) > 23 else "",
-            "exit_charges":        row[24] if len(row) > 24 else "",
-            "mtf_interest":        row[25] if len(row) > 25 else "",
-            "rr_achieved":         row[26] if len(row) > 26 else "",
-            "comments":            row[27] if len(row) > 27 else "",
-            "market_conditions":   row[28] if len(row) > 28 else ""
+            "total_pl":            row[21] if len(row) > 21 else "",
+            "entry_charges":       row[22] if len(row) > 22 else "",
+            "exit_charges":        row[23] if len(row) > 23 else "",
+            "mtf_interest":        row[24] if len(row) > 24 else "",
+            "rr_achieved":         row[25] if len(row) > 25 else "",
+            "comments":            row[26] if len(row) > 26 else "",
+            "market_conditions":   row[27] if len(row) > 27 else ""
         })
 
 # Open Risk tabs
