@@ -70,7 +70,7 @@ headers = all_trades_raw[0] if all_trades_raw else []
 trades = []
 for row in all_trades_raw[1:]:
     if len(row) >= 11:
-        trades.append({
+            trades.append({
             "status":              row[0]  if len(row) > 0  else "",
             "entry_date":          row[1]  if len(row) > 1  else "",
             "name":                row[2]  if len(row) > 2  else "",
@@ -89,9 +89,8 @@ for row in all_trades_raw[1:]:
             "total_open_risk":     row[15] if len(row) > 15 else "",
             "portfolio_size":      row[17] if len(row) > 17 else "",
             "risk_on_portfolio":   row[18] if len(row) > 18 else "",
-            "exit_price":          row[19] if len(row) > 19 else "",
-            "exit_date":           row[20] if len(row) > 20 else "",
-            "pl_per_share":        row[21] if len(row) > 21 else "",
+            "exit_date":           row[19] if len(row) > 19 else "",
+            "exit_price":          row[20] if len(row) > 20 else "",
             "total_pl":            row[21] if len(row) > 21 else "",
             "entry_charges":       row[22] if len(row) > 22 else "",
             "exit_charges":        row[23] if len(row) > 23 else "",
