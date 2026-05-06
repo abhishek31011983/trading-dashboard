@@ -204,6 +204,10 @@ table.t tbody tr:last-child{border-bottom:none;}
                     <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20 C6 4 10 14 12 10 C14 6 18 16 22 4"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
                     RR Distribution
                   </button>
+        <button class="nav-btn" id="btn-growth" onclick="go('growth')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+      Account Growth
+    </button>
   </div>
 
   <div class="main">
@@ -937,5 +941,42 @@ function renderAnalytics(){
 function renderRR(){const closed=T.filter(t=>t.status==='Closed');const isFO=t=>t.instrument==='Futures/Options';function buildRR(trades){return trades.map(t=>{const pl=pn(t.total_pl),risk=pn(t.total_risk);if(pl===null||!risk||risk===0)return null;return Math.round((pl/risk)*10)/10;}).filter(v=>v!==null);}function mkChart(cid,sid,rrs){const el=document.getElementById(cid);if(!el)return;if(!rrs.length){document.getElementById(sid).textContent='No data yet.';return;}const mn=Math.floor(Math.min(...rrs)),mx=Math.ceil(Math.max(...rrs)),bs=0.5,bk={};for(let b=mn;b<=mx;b+=bs)bk[b.toFixed(1)]=0;rrs.forEach(r=>{const k=(Math.floor(r/bs)*bs).toFixed(1);bk[k]=(bk[k]||0)+1;});const lb=Object.keys(bk).sort((a,b)=>+a-+b),vl=lb.map(l=>bk[l]);new Chart(el.getContext('2d'),{type:'bar',data:{labels:lb.map(l=>l+'R'),datasets:[{data:vl,backgroundColor:lb.map(l=>+l>=0?'rgba(59,130,246,0.7)':'rgba(244,63,94,0.5)'),borderColor:lb.map(l=>+l>=0?'#3b82f6':'#f43f5e'),borderWidth:1,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+' trade'+(c.raw!==1?'s':'')}}},scales:{x:{grid:{color:gc()},ticks:{color:tc()}},y:{grid:{color:gc()},ticks:{color:tc(),stepSize:1},beginAtZero:true}}}});const av=(rrs.reduce((a,b)=>a+b,0)/rrs.length).toFixed(2),w=rrs.filter(r=>r>0).length,lo=rrs.filter(r=>r<=0).length;document.getElementById(sid).innerHTML='Avg: <b>'+av+'R</b> | Best: <b>'+Math.max(...rrs).toFixed(2)+'R</b> | Worst: <b>'+Math.min(...rrs).toFixed(2)+'R</b> | Winners: <b>'+w+'</b> | Losers: <b>'+lo+'</b>';}mkChart('rrCashChart','rrCashStats',buildRR(closed.filter(t=>!isFO(t))));mkChart('rrFoChart','rrFoStats',buildRR(closed.filter(t=>isFO(t))));}
 document.addEventListener('DOMContentLoaded', loadData);
 </script>
+  <div class="page" id="growth">
+  <div class="ph">
+    <h1>Account Growth</h1>
+    <p>Portfolio equity curve vs Nifty benchmark</p>
+  </div>
+  <div class="card" style="margin:0 var(--space-4) var(--space-4)">
+    <div class="card-hdr">
+      <div class="card-title">Equity Curve</div>
+      <div style="display:flex;gap:var(--space-4);font-size:var(--text-xs);color:var(--muted);align-items:center;flex-wrap:wrap">
+        <span><span style="display:inline-block;width:12px;height:3px;background:#4f98a3;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Raw Portfolio</span>
+        <span><span style="display:inline-block;width:12px;height:3px;background:#6daa45;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Adjusted (excl. cash flows)</span>
+        <span><span style="display:inline-block;width:12px;height:3px;background:#e8af34;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Nifty (indexed)</span>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:320px"><canvas id="growthChart"></canvas></div>
+  </div>
+  <div class="card" style="margin:0 var(--space-4) var(--space-4)">
+    <div class="card-hdr"><div class="card-title">Weekly Deposits / Withdrawals</div></div>
+    <div class="chart-wrap" style="height:180px"><canvas id="cashFlowChart"></canvas></div>
+  </div>
+  <div class="kpi-panels" style="margin:0 var(--space-4)">
+    <div class="kpi-panel">
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-val" id="g-start">—</div><div class="kpi-lbl">Starting Value</div></div>
+        <div class="kpi"><div class="kpi-val" id="g-current">—</div><div class="kpi-lbl">Current Value</div></div>
+        <div class="kpi"><div class="kpi-val" id="g-raw-return">—</div><div class="kpi-lbl">Raw Return</div></div>
+      </div>
+    </div>
+    <div class="kpi-panel">
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-val" id="g-adj-return">—</div><div class="kpi-lbl">Adjusted Return</div></div>
+        <div class="kpi"><div class="kpi-val" id="g-nifty-return">—</div><div class="kpi-lbl">Nifty Return</div></div>
+        <div class="kpi"><div class="kpi-val" id="g-alpha">—</div><div class="kpi-lbl">Alpha vs Nifty</div></div>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
