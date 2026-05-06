@@ -14,6 +14,7 @@ client = gspread.authorize(creds)
 sheet = client.open_by_key('1hqg0c7PGiEaxC-PpOuyCSfivwyhPKgS0mpbNIa55Zio')
 dash_tab = sheet.worksheet("dashboard")
 all_trades_tab = sheet.worksheet("All Trades")
+account_size_tab = sheet.worksheet("Account Size")
 
 # 3. Fetch Data
 # Main Metrics
@@ -118,6 +119,19 @@ if len(derivatives_risk_raw) > 1:
         if len(row) >= 2 and row[0]:
             derivatives_risk_data.append({"symbol": row[0], "open_risk": row[1] if len(row) > 1 else ""})
 
+# Account Size tab — columns A:D (Date, Nifty Close, Deposits/Withdrawals, Portfolio Size)
+account_raw = account_size_tab.get_all_values()
+account_data = []
+if len(account_raw) > 1:
+    for row in account_raw[1:]:
+        if len(row) >= 4 and row[0]:
+            account_data.append({
+                "date":                row[0],
+                "nifty_close":         row[1] if len(row) > 1 else "",
+                "deposit_withdrawal":  row[2] if len(row) > 2 else "",
+                "portfolio_size":      row[3] if len(row) > 3 else ""
+            })
+
 data = {
     "metrics": metrics,
     "charts": {
@@ -129,8 +143,12 @@ data = {
         "cash": cash_risk_data,
         "derivatives": derivatives_risk_data
     },
+    "account_growth": account_data,
     "headers": headers
 }
+
+with open('data.json', 'w') as f:
+    json.dump(data, f)
 
 with open('data.json', 'w') as f:
     json.dump(data, f)
