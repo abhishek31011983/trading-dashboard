@@ -538,6 +538,44 @@ table.t tbody tr:last-child{border-bottom:none;}
           </div>
         </div>
       </div>
+
+    <div class="page" id="growth">
+      <div class="ph">
+    <h1>Account Growth</h1>
+    <p>Portfolio equity curve vs Nifty benchmark</p>
+  </div>
+  <div class="card" style="margin:0 var(--space-4) var(--space-4)">
+    <div class="card-hdr">
+      <div class="card-title">Equity Curve</div>
+      <div style="display:flex;gap:var(--space-4);font-size:var(--text-xs);color:var(--muted);align-items:center;flex-wrap:wrap">
+        <span><span style="display:inline-block;width:12px;height:3px;background:#4f98a3;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Raw Portfolio</span>
+        <span><span style="display:inline-block;width:12px;height:3px;background:#6daa45;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Adjusted (excl. cash flows)</span>
+        <span><span style="display:inline-block;width:12px;height:3px;background:#e8af34;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Nifty (indexed)</span>
+      </div>
+    </div>
+    <div class="chart-wrap" style="height:320px"><canvas id="growthChart"></canvas></div>
+  </div>
+  <div class="card" style="margin:0 var(--space-4) var(--space-4)">
+    <div class="card-hdr"><div class="card-title">Weekly Deposits / Withdrawals</div></div>
+    <div class="chart-wrap" style="height:180px"><canvas id="cashFlowChart"></canvas></div>
+  </div>
+  <div class="kpi-panels" style="margin:0 var(--space-4)">
+    <div class="kpi-panel">
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-val" id="g-start">—</div><div class="kpi-lbl">Starting Value</div></div>
+        <div class="kpi"><div class="kpi-val" id="g-current">—</div><div class="kpi-lbl">Current Value</div></div>
+        <div class="kpi"><div class="kpi-val" id="g-raw-return">—</div><div class="kpi-lbl">Raw Return</div></div>
+      </div>
+    </div>
+    <div class="kpi-panel">
+      <div class="kpi-row">
+        <div class="kpi"><div class="kpi-val" id="g-adj-return">—</div><div class="kpi-lbl">Adjusted Return</div></div>
+        <div class="kpi"><div class="kpi-val" id="g-nifty-return">—</div><div class="kpi-lbl">Nifty Return</div></div>
+        <div class="kpi"><div class="kpi-val" id="g-alpha">—</div><div class="kpi-lbl">Alpha vs Nifty</div></div>
+      </div>
+    </div>
+  </div>
+</div>
     </div>
   </div>
 
@@ -1042,44 +1080,6 @@ function renderGrowth(){
   });
 }
   document.addEventListener('DOMContentLoaded', loadData);
-  <div class="page" id="growth">  
-        <div class="ph">
-    <h1>Account Growth</h1>
-    <p>Portfolio equity curve vs Nifty benchmark</p>
-  </div>
-  <div class="card" style="margin:0 var(--space-4) var(--space-4)">
-    <div class="card-hdr">
-      <div class="card-title">Equity Curve</div>
-      <div style="display:flex;gap:var(--space-4);font-size:var(--text-xs);color:var(--muted);align-items:center;flex-wrap:wrap">
-        <span><span style="display:inline-block;width:12px;height:3px;background:#4f98a3;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Raw Portfolio</span>
-        <span><span style="display:inline-block;width:12px;height:3px;background:#6daa45;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Adjusted (excl. cash flows)</span>
-        <span><span style="display:inline-block;width:12px;height:3px;background:#e8af34;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Nifty (indexed)</span>
-      </div>
-    </div>
-    <div class="chart-wrap" style="height:320px"><canvas id="growthChart"></canvas></div>
-  </div>
-  <div class="card" style="margin:0 var(--space-4) var(--space-4)">
-    <div class="card-hdr"><div class="card-title">Weekly Deposits / Withdrawals</div></div>
-    <div class="chart-wrap" style="height:180px"><canvas id="cashFlowChart"></canvas></div>
-  </div>
-  <div class="kpi-panels" style="margin:0 var(--space-4)">
-    <div class="kpi-panel">
-      <div class="kpi-row">
-        <div class="kpi"><div class="kpi-val" id="g-start">—</div><div class="kpi-lbl">Starting Value</div></div>
-        <div class="kpi"><div class="kpi-val" id="g-current">—</div><div class="kpi-lbl">Current Value</div></div>
-        <div class="kpi"><div class="kpi-val" id="g-raw-return">—</div><div class="kpi-lbl">Raw Return</div></div>
-      </div>
-    </div>
-    <div class="kpi-panel">
-      <div class="kpi-row">
-        <div class="kpi"><div class="kpi-val" id="g-adj-return">—</div><div class="kpi-lbl">Adjusted Return</div></div>
-        <div class="kpi"><div class="kpi-val" id="g-nifty-return">—</div><div class="kpi-lbl">Nifty Return</div></div>
-        <div class="kpi"><div class="kpi-val" id="g-alpha">—</div><div class="kpi-lbl">Alpha vs Nifty</div></div>
-      </div>
-    </div>
-  </div>
-</div>
 </script>
-      
 </body>
 </html>
