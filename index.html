@@ -616,7 +616,8 @@ function go(name){
   document.getElementById('btn-'+name).classList.add('active');
   if(name==='journal') renderJ();
   if(name==='openrisk') renderOpenRisk(window._D);
-  if(name==='analytics') renderAnalytics(); if(name==='rrdist') renderRR();
+  if(name==='analytics') renderAnalytics(); if(name==='rrdist') renderRR(); 
+  if(name==='growth') renderGrowth();
 }
 
 // ── LOAD ───────────────────────────────────────────────────────
@@ -939,7 +940,108 @@ function renderAnalytics(){
   avgWinLoss(fo, 'fo');
 }
 function renderRR(){const closed=T.filter(t=>t.status==='Closed');const isFO=t=>t.instrument==='Futures/Options';function buildRR(trades){return trades.map(t=>{const pl=pn(t.total_pl),risk=pn(t.total_risk);if(pl===null||!risk||risk===0)return null;return Math.round((pl/risk)*10)/10;}).filter(v=>v!==null);}function mkChart(cid,sid,rrs){const el=document.getElementById(cid);if(!el)return;if(!rrs.length){document.getElementById(sid).textContent='No data yet.';return;}const mn=Math.floor(Math.min(...rrs)),mx=Math.ceil(Math.max(...rrs)),bs=0.5,bk={};for(let b=mn;b<=mx;b+=bs)bk[b.toFixed(1)]=0;rrs.forEach(r=>{const k=(Math.floor(r/bs)*bs).toFixed(1);bk[k]=(bk[k]||0)+1;});const lb=Object.keys(bk).sort((a,b)=>+a-+b),vl=lb.map(l=>bk[l]);new Chart(el.getContext('2d'),{type:'bar',data:{labels:lb.map(l=>l+'R'),datasets:[{data:vl,backgroundColor:lb.map(l=>+l>=0?'rgba(59,130,246,0.7)':'rgba(244,63,94,0.5)'),borderColor:lb.map(l=>+l>=0?'#3b82f6':'#f43f5e'),borderWidth:1,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+' trade'+(c.raw!==1?'s':'')}}},scales:{x:{grid:{color:gc()},ticks:{color:tc()}},y:{grid:{color:gc()},ticks:{color:tc(),stepSize:1},beginAtZero:true}}}});const av=(rrs.reduce((a,b)=>a+b,0)/rrs.length).toFixed(2),w=rrs.filter(r=>r>0).length,lo=rrs.filter(r=>r<=0).length;document.getElementById(sid).innerHTML='Avg: <b>'+av+'R</b> | Best: <b>'+Math.max(...rrs).toFixed(2)+'R</b> | Worst: <b>'+Math.min(...rrs).toFixed(2)+'R</b> | Winners: <b>'+w+'</b> | Losers: <b>'+lo+'</b>';}mkChart('rrCashChart','rrCashStats',buildRR(closed.filter(t=>!isFO(t))));mkChart('rrFoChart','rrFoStats',buildRR(closed.filter(t=>isFO(t))));}
-document.addEventListener('DOMContentLoaded', loadData);
+function renderGrowth(){
+  const rows = (window._D && window._D.account_growth) ? window._D.account_growth : [];
+  const data = [...rows].filter(r => r.date && r.portfolio_size).reverse();
+  if(!data.length){
+    document.getElementById('growthChart').parentElement.innerHTML = '<p style="color:var(--muted);padding:var(--space-4)">No account data yet.</p>';
+    return;
+  }
+
+  function pn2(v){ if(!v||v==='')return 0; return parseFloat(String(v).replace(/[^0-9.-]/g,''))||0; }
+
+  const labels   = data.map(r => r.date);
+  const rawVals  = data.map(r => pn2(r.portfolio_size));
+  const cashFlow = data.map(r => pn2(r.deposit_withdrawal));
+  const niftyRaw = data.map(r => pn2(r.nifty_close));
+
+  // Adjusted series — strips out deposits/withdrawals
+  const adjVals = [rawVals[0]];
+  for(let i = 1; i < rawVals.length; i++){
+    const adjustedBase = rawVals[i-1] + cashFlow[i];
+    const weekReturn   = adjustedBase > 0 ? rawVals[i] / adjustedBase : 1;
+    adjVals[i]         = adjVals[i-1] * weekReturn;
+  }
+
+  // Nifty indexed to starting portfolio value
+  const niftyStart   = niftyRaw.find(v => v > 0);
+  const niftyIndexed = niftyRaw.map(v => v > 0 ? (v / niftyStart) * rawVals[0] : null);
+
+  // KPIs
+  const start  = rawVals[0];
+  const current= rawVals[rawVals.length - 1];
+  const rawRet = ((current - start) / start * 100).toFixed(2);
+  const adjRet = ((adjVals[adjVals.length - 1] - adjVals[0]) / adjVals[0] * 100).toFixed(2);
+  const niftyValid = niftyIndexed.filter(v => v !== null);
+  const niftyLast  = niftyValid.length ? niftyValid[niftyValid.length - 1] : null;
+  const niftyRet   = niftyLast ? ((niftyLast - rawVals[0]) / rawVals[0] * 100).toFixed(2) : null;
+  const alpha      = niftyRet !== null ? (+adjRet - +niftyRet).toFixed(2) : null;
+
+  document.getElementById('g-start').textContent   = fr(start);
+  document.getElementById('g-current').textContent = fr(current);
+
+  const rawEl = document.getElementById('g-raw-return');
+  rawEl.textContent = rawRet + '%';
+  rawEl.className   = 'kpi-val ' + (+rawRet >= 0 ? 'up' : 'down');
+
+  const adjEl = document.getElementById('g-adj-return');
+  adjEl.textContent = adjRet + '%';
+  adjEl.className   = 'kpi-val ' + (+adjRet >= 0 ? 'up' : 'down');
+
+  const nEl = document.getElementById('g-nifty-return');
+  nEl.textContent = niftyRet ? niftyRet + '%' : '—';
+  nEl.className   = 'kpi-val ' + (niftyRet ? (+niftyRet >= 0 ? 'up' : 'down') : '');
+
+  const aEl = document.getElementById('g-alpha');
+  aEl.textContent = alpha !== null ? (alpha > 0 ? '+' : '') + alpha + '%' : '—';
+  aEl.className   = 'kpi-val ' + (alpha !== null ? (+alpha >= 0 ? 'up' : 'down') : '');
+
+  const gc2 = () => getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || 'rgba(128,128,128,0.2)';
+  const tc2 = () => getComputedStyle(document.documentElement).getPropertyValue('--muted').trim() || '#888';
+
+  if(CI['growthChart']) CI['growthChart'].destroy();
+  CI['growthChart'] = new Chart(document.getElementById('growthChart').getContext('2d'), {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        { label:'Raw Portfolio',   data:rawVals,      borderColor:'#4f98a3', backgroundColor:'rgba(79,152,163,0.07)', borderWidth:2, pointRadius:3, tension:0.3, fill:true },
+        { label:'Adjusted',        data:adjVals,      borderColor:'#6daa45', backgroundColor:'transparent',           borderWidth:2, pointRadius:3, tension:0.3 },
+        { label:'Nifty (indexed)', data:niftyIndexed, borderColor:'#e8af34', backgroundColor:'transparent',           borderWidth:1.5, pointRadius:2, tension:0.3, borderDash:[5,4] }
+      ]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ mode:'index', intersect:false, callbacks:{ label: c => ' '+c.dataset.label+': '+fr(c.raw||0) }}},
+      scales:{
+        x:{ grid:{color:gc2()}, ticks:{color:tc2(), maxRotation:45, font:{size:11}} },
+        y:{ grid:{color:gc2()}, ticks:{color:tc2(), callback: v => '₹'+(v/1e5).toFixed(1)+'L'} }
+      }
+    }
+  });
+
+  if(CI['cashFlowChart']) CI['cashFlowChart'].destroy();
+  CI['cashFlowChart'] = new Chart(document.getElementById('cashFlowChart').getContext('2d'), {
+    type: 'bar',
+    data:{
+      labels,
+      datasets:[{ label:'Cash Flow', data:cashFlow,
+        backgroundColor: cashFlow.map(v => v>0 ? 'rgba(109,170,69,0.7)' : v<0 ? 'rgba(209,99,167,0.5)' : 'rgba(128,128,128,0.15)'),
+        borderColor:     cashFlow.map(v => v>0 ? '#6daa45'              : v<0 ? '#d163a7'               : 'transparent'),
+        borderWidth:1, borderRadius:3
+      }]
+    },
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false}, tooltip:{ callbacks:{ label: c => fr(c.raw, true) }}},
+      scales:{
+        x:{ grid:{color:gc2()}, ticks:{color:tc2(), font:{size:11}} },
+        y:{ grid:{color:gc2()}, ticks:{color:tc2(), callback: v => fr(v, true)} }
+      }
+    }
+  });
+}
+  document.addEventListener('DOMContentLoaded', loadData);
 </script>
   <div class="page" id="growth">
   <div class="ph">
