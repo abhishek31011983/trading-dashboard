@@ -987,7 +987,7 @@ function renderGrowth(){
   if(!pg || !pg.classList.contains('active')){ return; }
   if(!window._D){ setTimeout(renderGrowth, 300); return; }
   const rows = window._D.account_growth || [];
-  const data = [...rows].filter(r => r.date && r.portfolio_size).reverse();
+  const data = [...rows].filter(r => r.date && r.portfolio_size && String(r.portfolio_size).trim() !== '0' && String(r.portfolio_size).trim() !== '').reverse();
   if(!data.length){
     document.getElementById('growthChart').parentElement.innerHTML = '<p style="color:var(--muted);padding:var(--space-4)">No account data yet.</p>';
     return;
