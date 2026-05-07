@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RR Distribution</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --surface: #161b27; --border: #2d3650;
+    --text: #e2e8f0; --muted: #7a8aaa;
+    --success: #22c55e; --error: #f43f5e; --primary: #3b82f6;
+    --cash: #3b82f6; --fo: #a78bfa;
+    --font: Inter, Helvetica Neue, sans-serif;
+    --mono: JetBrains Mono, Courier New, monospace;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; padding: 2rem; }
+  h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 2rem; }
+  .back { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.8rem;
+          text-decoration: none; margin-bottom: 1.5rem; padding: 6px 12px; border: 1px solid var(--border);
+          border-radius: 6px; transition: color 0.2s; }
+  .back:hover { color: var(--text); }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; }
+  .card.cash-card { border-top: 2px solid var(--cash); }
+  .card.fo-card   { border-top: 2px solid var(--fo); }
+  .card-title { font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem; }
+  .cash-card .card-title { color: var(--cash); }
+  .fo-card   .card-title { color: var(--fo); }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.75rem; margin-bottom: 1.25rem; }
+  .stat { background: var(--bg); border-radius: 8px; padding: 0.75rem; }
+  .stat-val { font-family: var(--mono); font-size: 1.1rem; font-weight: 700; }
+  .stat-lbl { font-size: 0.7rem; color: var(--muted); margin-top: 2px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .up { color: #22c55e; } .down { color: #f43f5e; } .neutral { color: var(--muted); }
+
+  .chart-container { position: relative; height: 260px; width: 100%; }
+
+  /* Trade list */
+  .trade-list { margin-top: 1.25rem; max-height: 200px; overflow-y: auto; }
+  .trade-list::-webkit-scrollbar { width: 4px; }
+  .trade-list::-webkit-scrollbar-track { background: transparent; }
+  .trade-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+  .trade-row { display: flex; justify-content: space-between; align-items: center;
+               padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 0.78rem; }
+  .trade-row:last-child { border-bottom: none; }
+  .trade-name { color: var(--text); font-weight: 500; }
+  .trade-rr { font-family: var(--mono); font-weight: 600; }
+  .trade-pl { font-family: var(--mono); font-size: 0.72rem; color: var(--muted); }
+
+  .section-lbl { font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+                 letter-spacing: 0.06em; color: var(--muted); margin: 1rem 0 0.5rem; }
+
+  @media (max-width: 768px) {
+    .grid { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">&#8592; Back to Dashboard</a>
+<h1>RR Distribution</h1>
+<p class="sub">Risk/Reward breakdown for all closed trades</p>
+
+<div class="grid">
+  <!-- CASH -->
+  <div class="card cash-card">
+    <div class="card-title">Cash Trades</div>
+    <div class="stats" id="cashStats"></div>
+    <div class="chart-container"><canvas id="cashChart"></canvas></div>
+    <div class="section-lbl">All Trades</div>
+    <div class="trade-list" id="cashList"></div>
+  </div>
+
+  <!-- FO -->
+  <div class="card fo-card">
+    <div class="card-title">Futures &amp; Options</div>
+    <div class="stats" id="foStats"></div>
+    <div class="chart-container"><canvas id="foChart"></canvas></div>
+    <div class="section-lbl">All Trades</div>
+    <div class="trade-list" id="foList"></div>
+  </div>
+</div>
+
+<script>
+function pn(v){ if(!v||v===''||v===null) return null; const s=String(v).replace(/[^0-9.\-(]/g,''); const n=parseFloat(s); return isNaN(n)?null:(String(v).includes('(')?-n:n); }
+function fr(n,sign=false){ if(n===null||n===undefined) return '—'; const a=Math.abs(n); const s=a>=1e5?'₹'+(a/1e5).toFixed(2)+'L':'₹'+a.toLocaleString('en-IN',{maximumFractionDigits:0}); if(sign) return (n>=0?'+':'-')+s; return n<0?'-'+s:s; }
+
+function buildStats(rrs, elId){
+  if(!rrs.length){ document.getElementById(elId).innerHTML='<div style="color:var(--muted);font-size:0.8rem">No data</div>'; return; }
+  const avg = (rrs.reduce((a,b)=>a+b,0)/rrs.length).toFixed(2);
+  const best = Math.max(...rrs).toFixed(1);
+  const worst = Math.min(...rrs).toFixed(1);
+  const winners = rrs.filter(r=>r>0).length;
+  const losers  = rrs.filter(r=>r<=0).length;
+  document.getElementById(elId).innerHTML = `
+    <div class="stat"><div class="stat-val ${+avg>=0?'up':'down'}">${avg}R</div><div class="stat-lbl">Avg RR</div></div>
+    <div class="stat"><div class="stat-val up">${best}R</div><div class="stat-lbl">Best</div></div>
+    <div class="stat"><div class="stat-val down">${worst}R</div><div class="stat-lbl">Worst</div></div>
+    <div class="stat"><div class="stat-val">${winners}W / ${losers}L</div><div class="stat-lbl">Win / Loss</div></div>
+  `;
+}
+
+function buildChart(rrs, canvasId, color){
+  if(!rrs.length) return;
+  // Build bins of 0.5R width
+  const mn=Math.floor(Math.min(...rrs)), mx=Math.ceil(Math.max(...rrs));
+  const bs=0.5, bins={};
+  for(let b=mn; b<=mx; b+=bs) bins[b.toFixed(1)]=0;
+  rrs.forEach(r=>{ const k=(Math.floor(r/bs)*bs).toFixed(1); if(bins[k]!==undefined) bins[k]++; else bins[k]=1; });
+  const labels=Object.keys(bins).sort((a,b)=>a-b);
+  const vals=labels.map(l=>bins[l]);
+  const bgColors=labels.map(l=>+l>=0?'rgba(34,197,94,0.7)':'rgba(244,63,94,0.55)');
+  const bdColors=labels.map(l=>+l>=0?'#22c55e':'#f43f5e');
+
+  new Chart(document.getElementById(canvasId), {
+    type:'bar',
+    data:{ labels: labels.map(l=>l+'R'), datasets:[{
+      data:vals, backgroundColor:bgColors, borderColor:bdColors,
+      borderWidth:1, borderRadius:4
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{ legend:{display:false},
+        tooltip:{ callbacks:{ label:c=>c.raw+' trade'+(c.raw!==1?'s':''),
+                               title:t=>t[0].label+' bucket' }}},
+      scales:{
+        x:{ grid:{color:'rgba(45,54,80,1)'}, ticks:{color:'#7a8aaa',font:{size:11}} },
+        y:{ grid:{color:'rgba(45,54,80,1)'}, ticks:{color:'#7a8aaa',stepSize:1,beginAtZero:true} }
+      }
+    }
+  });
+}
+
+function buildList(trades, elId){
+  if(!trades.length){ document.getElementById(elId).innerHTML='<div style="color:var(--muted);font-size:0.8rem;padding:8px 0">No trades</div>'; return; }
+  const sorted=[...trades].sort((a,b)=>b.rr-a.rr);
+  document.getElementById(elId).innerHTML = sorted.map(t=>`
+    <div class="trade-row">
+      <span class="trade-name">${t.name}</span>
+      <span>
+        <span class="trade-rr ${t.rr>0?'up':'down'}">${t.rr>0?'+':''}${t.rr}R</span>
+        &nbsp;
+        <span class="trade-pl">${fr(t.pl,true)}</span>
+      </span>
+    </div>`).join('');
+}
+
+async function init(){
+  const r = await fetch('data.json?v='+Date.now(), {cache:'no-store'});
+  const d = await r.json();
+  const trades = (d.trades||[]).filter(t=>t.status==='Closed');
+
+  const isFO = t => t.instrument==='Futures/Options';
+
+  function extract(trades){
+    return trades.map(t=>{
+      const pl=pn(t.total_pl), risk=pn(t.total_risk);
+      if(pl===null||!risk||risk===0) return null;
+      return { name:t.name, pl, risk, rr:Math.round((pl/risk)*10)/10, instrument:t.instrument };
+    }).filter(Boolean);
+  }
+
+  const cashTrades = extract(trades.filter(t=>!isFO(t)));
+  const foTrades   = extract(trades.filter(t=>isFO(t)));
+
+  const cashRRs = cashTrades.map(t=>t.rr);
+  const foRRs   = foTrades.map(t=>t.rr);
+
+  buildStats(cashRRs, 'cashStats');
+  buildStats(foRRs,   'foStats');
+  buildChart(cashRRs, 'cashChart', '#3b82f6');
+  buildChart(foRRs,   'foChart',   '#a78bfa');
+  buildList(cashTrades, 'cashList');
+  buildList(foTrades,   'foList');
+}
+
+init();
+</script>
+</body>
+</html>
