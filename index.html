@@ -671,6 +671,8 @@ async function loadData(){
     if(active==='journal') renderJ();
     if(active==='openrisk') renderOpenRisk(d);
     if(active==='analytics') renderAnalytics();
+    if(active==='rrdist') renderRR();
+    if(active==='growth') renderGrowth();
     document.getElementById('lastUpd').innerHTML=
       `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Updated ${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
   }catch(e){
