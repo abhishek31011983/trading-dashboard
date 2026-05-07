@@ -553,11 +553,11 @@ table.t tbody tr:last-child{border-bottom:none;}
             <span><span style="display:inline-block;width:12px;height:3px;background:#e8af34;border-radius:2px;vertical-align:middle;margin-right:4px"></span>Nifty (indexed)</span>
           </div>
         </div>
-        <div class="chart-wrap" style="height:320px"><canvas id="growthChart"></canvas></div>
+        <div class="chart-wrap" style="height:320px"><canvas id="growthChart" style="height:320px;width:100%"></canvas></div>
       </div>
       <div class="card" style="margin:0 var(--space-4) var(--space-4)">
         <div class="card-hdr"><div class="card-title">Weekly Deposits / Withdrawals</div></div>
-        <div class="chart-wrap" style="height:180px"><canvas id="cashFlowChart"></canvas></div>
+        <div class="chart-wrap" style="height:180px"><canvas id="cashFlowChart" style="height:180px;width:100%"></canvas></div>
       </div>
       <div class="kpi-panels" style="margin:0 var(--space-4)">
         <div class="kpi-panel">
@@ -1045,7 +1045,7 @@ function renderGrowth(){
   const tc2 = () => getComputedStyle(document.documentElement).getPropertyValue('--muted').trim() || '#888';
 
   if(CI['growthChart']) CI['growthChart'].destroy();
-  CI['growthChart'] = new Chart(document.getElementById('growthChart').getContext('2d'), {
+  CI['growthnew Chart(document.getElementById('growthChart'), {
     type: 'line',
     data: {
       labels,
@@ -1066,7 +1066,7 @@ function renderGrowth(){
   });
 
   if(CI['cashFlowChart']) CI['cashFlowChart'].destroy();
-  CI['cashFlowChart'] = new Chart(document.getElementById('cashFlowChart').getContext('2d'), {
+  new Chart(document.getElementById('cashFlowChart'), {
     type: 'bar',
     data:{
       labels,
