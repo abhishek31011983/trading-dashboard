@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Account Growth</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0f1117; --surface: #161b27; --border: #2d3650;
+    --text: #e2e8f0; --muted: #7a8aaa;
+    --success: #22c55e; --error: #f43f5e;
+    --font: Inter, Helvetica Neue, sans-serif;
+    --mono: JetBrains Mono, Courier New, monospace;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; padding: 2rem; }
+  h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.25rem; }
+  .sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 2rem; }
+  .back { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.8rem;
+          text-decoration: none; margin-bottom: 1.5rem; padding: 6px 12px; border: 1px solid var(--border);
+          border-radius: 6px; transition: color 0.2s; }
+  .back:hover { color: var(--text); }
+  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+  .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+  .kpi-val { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; line-height: 1.2; }
+  .kpi-lbl { font-size: 0.75rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
+  .up { color: #22c55e; } .down { color: #f43f5e; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
+  .card-title { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem; }
+  .legend { display: flex; gap: 1.5rem; font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; flex-wrap: wrap; }
+  .legend span { display: inline-block; width: 12px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
+  .chart-container { position: relative; height: 320px; width: 100%; }
+  .chart-container-sm { position: relative; height: 180px; width: 100%; }
+  @media (max-width: 600px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+
+<a class="back" href="index.html">&#8592; Back to Dashboard</a>
+<h1>Account Growth</h1>
+<p class="sub">Portfolio equity curve vs Nifty 50 benchmark</p>
+
+<div class="kpi-row">
+  <div class="kpi"><div class="kpi-val" id="g-start">—</div><div class="kpi-lbl">Starting Value</div></div>
+  <div class="kpi"><div class="kpi-val" id="g-current">—</div><div class="kpi-lbl">Current Value</div></div>
+  <div class="kpi"><div class="kpi-val" id="g-raw-return">—</div><div class="kpi-lbl">Raw Return</div></div>
+  <div class="kpi"><div class="kpi-val" id="g-adj-return">—</div><div class="kpi-lbl">Adjusted Return</div></div>
+  <div class="kpi"><div class="kpi-val" id="g-nifty-return">—</div><div class="kpi-lbl">Nifty Return</div></div>
+  <div class="kpi"><div class="kpi-val" id="g-alpha">—</div><div class="kpi-lbl">Alpha vs Nifty</div></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Equity Curve</div>
+  <div class="legend">
+    <div><span style="background:#4f98a3"></span>Raw Portfolio</div>
+    <div><span style="background:#6daa45"></span>Adjusted (excl. cash flows)</div>
+    <div><span style="background:#e8af34"></span>Nifty (indexed)</div>
+  </div>
+  <div class="chart-container">
+    <canvas id="growthChart"></canvas>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-title">Weekly Deposits / Withdrawals</div>
+  <div class="chart-container-sm">
+    <canvas id="cashFlowChart"></canvas>
+  </div>
+</div>
+
+<script>
+function pn(v){ if(!v||v==='') return 0; return parseFloat(String(v).replace(/[^0-9.-]/g,''))||0; }
+function fr(n){ if(n===null||n===undefined) return '—'; const a=Math.abs(n); return a>=1e5?'₹'+(a/1e5).toFixed(2)+'L':'₹'+a.toLocaleString('en-IN'); }
+
+async function init(){
+  const r = await fetch('data.json?v='+Date.now(), {cache:'no-store'});
+  const d = await r.json();
+  const rows = (d.account_growth||[]).filter(r=>r.date&&r.portfolio_size).reverse();
+  if(!rows.length){ document.body.innerHTML += '<p style="color:#7a8aaa">No data available.</p>'; return; }
+
+  const labels   = rows.map(r=>r.date);
+  const rawVals  = rows.map(r=>pn(r.portfolio_size));
+  const cashFlow = rows.map(r=>pn(r.deposit_withdrawal));
+  const niftyRaw = rows.map(r=>pn(r.nifty_close));
+
+  const adjVals = [rawVals[0]];
+  for(let i=1;i<rawVals.length;i++){
+    const base = rawVals[i-1] + cashFlow[i];
+    adjVals[i] = adjVals[i-1] * (base>0 ? rawVals[i]/base : 1);
+  }
+
+  const niftyStart = niftyRaw.find(v=>v>0);
+  const niftyIndexed = niftyRaw.map(v=>v>0?(v/niftyStart)*rawVals[0]:null);
+
+  const start=rawVals[0], current=rawVals[rawVals.length-1];
+  const rawRet=((current-start)/start*100).toFixed(2);
+  const adjRet=((adjVals[adjVals.length-1]-adjVals[0])/adjVals[0]*100).toFixed(2);
+  const niftyValid=niftyIndexed.filter(v=>v!==null);
+  const niftyLast=niftyValid.length?niftyValid[niftyValid.length-1]:null;
+  const niftyRet=niftyLast?((niftyLast-rawVals[0])/rawVals[0]*100).toFixed(2):null;
+  const alpha=niftyRet!==null?(+adjRet - +niftyRet).toFixed(2):null;
+
+  document.getElementById('g-start').textContent   = fr(start);
+  document.getElementById('g-current').textContent = fr(current);
+
+  const rE=document.getElementById('g-raw-return');
+  rE.textContent=rawRet+'%'; rE.className='kpi-val '+(+rawRet>=0?'up':'down');
+  const aE=document.getElementById('g-adj-return');
+  aE.textContent=adjRet+'%'; aE.className='kpi-val '+(+adjRet>=0?'up':'down');
+  const nE=document.getElementById('g-nifty-return');
+  nE.textContent=niftyRet?niftyRet+'%':'—'; nE.className='kpi-val '+(niftyRet?(+niftyRet>=0?'up':'down'):'');
+  const alE=document.getElementById('g-alpha');
+  alE.textContent=alpha!==null?(alpha>0?'+':'')+alpha+'%':'—';
+  alE.className='kpi-val '+(alpha!==null?(+alpha>=0?'up':'down'):'');
+
+  const gc='rgba(45,54,80,1)', tc='#7a8aaa';
+
+  new Chart(document.getElementById('growthChart'), {
+    type:'line',
+    data:{ labels, datasets:[
+      {label:'Raw Portfolio',   data:rawVals,      borderColor:'#4f98a3',backgroundColor:'rgba(79,152,163,0.07)',borderWidth:2,pointRadius:3,tension:0.3,fill:true},
+      {label:'Adjusted',        data:adjVals,      borderColor:'#6daa45',backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:0.3},
+      {label:'Nifty (indexed)', data:niftyIndexed, borderColor:'#e8af34',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,tension:0.3,borderDash:[5,4]}
+    ]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>' '+c.dataset.label+': '+fr(c.raw||0)}}},
+      scales:{
+        x:{grid:{color:gc},ticks:{color:tc,maxRotation:45,font:{size:11}}},
+        y:{grid:{color:gc},ticks:{color:tc,callback:v=>'₹'+(v/1e5).toFixed(1)+'L'}}
+      }
+    }
+  });
+
+  new Chart(document.getElementById('cashFlowChart'), {
+    type:'bar',
+    data:{ labels, datasets:[{
+      label:'Cash Flow', data:cashFlow,
+      backgroundColor:cashFlow.map(v=>v>0?'rgba(109,170,69,0.7)':v<0?'rgba(209,99,167,0.5)':'rgba(128,128,128,0.15)'),
+      borderColor:cashFlow.map(v=>v>0?'#6daa45':v<0?'#d163a7':'transparent'),
+      borderWidth:1, borderRadius:3
+    }]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fr(c.raw)}}},
+      scales:{
+        x:{grid:{color:gc},ticks:{color:tc,font:{size:11}}},
+        y:{grid:{color:gc},ticks:{color:tc,callback:v=>fr(v)}}
+      }
+    }
+  });
+}
+
+init();
+</script>
+</body>
+</html>
