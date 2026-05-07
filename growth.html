@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+html = """<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
@@ -9,30 +9,61 @@
   * { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
     --bg: #0f1117; --surface: #161b27; --border: #2d3650;
-    --text: #e2e8f0; --muted: #7a8aaa;
-    --success: #22c55e; --error: #f43f5e;
+    --text: #e2e8f0; --muted: #7a8aaa; --faint: #3d4a65;
+    --success: #22c55e; --error: #f43f5e; --primary: #3b82f6;
     --font: Inter, Helvetica Neue, sans-serif;
     --mono: JetBrains Mono, Courier New, monospace;
   }
   body { background: var(--bg); color: var(--text); font-family: var(--font); min-height: 100vh; padding: 2rem; }
   h1 { font-size: 1.8rem; font-weight: 700; margin-bottom: 0.25rem; }
-  .sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 2rem; }
+  .sub { color: var(--muted); font-size: 0.875rem; margin-bottom: 1.5rem; }
   .back { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 0.8rem;
           text-decoration: none; margin-bottom: 1.5rem; padding: 6px 12px; border: 1px solid var(--border);
           border-radius: 6px; transition: color 0.2s; }
   .back:hover { color: var(--text); }
-  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+
+  /* FILTER BAR */
+  .filter-bar { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .preset-btns { display: flex; gap: 0.4rem; }
+  .preset-btn { padding: 5px 14px; border-radius: 6px; border: 1px solid var(--border); background: var(--surface);
+                color: var(--muted); font-size: 0.78rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .preset-btn:hover { color: var(--text); border-color: var(--muted); }
+  .preset-btn.active { background: rgba(59,130,246,0.15); color: var(--primary); border-color: var(--primary); }
+  .divider { width: 1px; height: 24px; background: var(--border); }
+  .date-inputs { display: flex; align-items: center; gap: 0.5rem; }
+  .date-inputs label { font-size: 0.75rem; color: var(--muted); }
+  .date-inputs input[type="date"] {
+    padding: 5px 10px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface); color: var(--text); font-size: 0.78rem; font-family: var(--font);
+    cursor: pointer;
+  }
+  .date-inputs input[type="date"]:focus { outline: none; border-color: var(--primary); }
+  .apply-btn { padding: 5px 14px; border-radius: 6px; border: 1px solid rgba(59,130,246,0.4);
+               background: rgba(59,130,246,0.15); color: var(--primary); font-size: 0.78rem;
+               font-weight: 600; cursor: pointer; transition: all 0.15s; }
+  .apply-btn:hover { background: var(--primary); color: #fff; }
+  .range-label { font-size: 0.75rem; color: var(--muted); margin-left: auto; }
+
+  /* KPIs */
+  .kpi-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
   .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
   .kpi-val { font-family: var(--mono); font-size: 1.4rem; font-weight: 700; line-height: 1.2; }
   .kpi-lbl { font-size: 0.75rem; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: 0.06em; }
   .up { color: #22c55e; } .down { color: #f43f5e; }
+
+  /* CARDS */
   .card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.5rem; }
   .card-title { font-size: 0.75rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 1rem; }
   .legend { display: flex; gap: 1.5rem; font-size: 0.75rem; color: var(--muted); margin-bottom: 1rem; flex-wrap: wrap; }
   .legend span { display: inline-block; width: 12px; height: 3px; border-radius: 2px; vertical-align: middle; margin-right: 4px; }
   .chart-container { position: relative; height: 320px; width: 100%; }
   .chart-container-sm { position: relative; height: 180px; width: 100%; }
-  @media (max-width: 600px) { .kpi-row { grid-template-columns: 1fr 1fr; } }
+
+  @media (max-width: 600px) {
+    .kpi-row { grid-template-columns: 1fr 1fr; }
+    .filter-bar { flex-direction: column; align-items: flex-start; }
+    .range-label { margin-left: 0; }
+  }
 </style>
 </head>
 <body>
@@ -41,6 +72,26 @@
 <h1>Account Growth</h1>
 <p class="sub">Portfolio equity curve vs Nifty 50 benchmark</p>
 
+<!-- FILTER BAR -->
+<div class="filter-bar">
+  <div class="preset-btns">
+    <button class="preset-btn" onclick="applyPreset('3M')">3M</button>
+    <button class="preset-btn" onclick="applyPreset('6M')">6M</button>
+    <button class="preset-btn" onclick="applyPreset('1Y')">1Y</button>
+    <button class="preset-btn active" onclick="applyPreset('ALL')">All</button>
+  </div>
+  <div class="divider"></div>
+  <div class="date-inputs">
+    <label>From</label>
+    <input type="date" id="dateFrom">
+    <label>To</label>
+    <input type="date" id="dateTo">
+    <button class="apply-btn" onclick="applyCustomRange()">Apply</button>
+  </div>
+  <span class="range-label" id="rangeLabel"></span>
+</div>
+
+<!-- KPIs -->
 <div class="kpi-row">
   <div class="kpi"><div class="kpi-val" id="g-start">—</div><div class="kpi-lbl">Starting Value</div></div>
   <div class="kpi"><div class="kpi-val" id="g-current">—</div><div class="kpi-lbl">Current Value</div></div>
@@ -50,6 +101,7 @@
   <div class="kpi"><div class="kpi-val" id="g-alpha">—</div><div class="kpi-lbl">Alpha vs Nifty</div></div>
 </div>
 
+<!-- CHARTS -->
 <div class="card">
   <div class="card-title">Equity Curve</div>
   <div class="legend">
@@ -57,42 +109,48 @@
     <div><span style="background:#6daa45"></span>Adjusted (excl. cash flows)</div>
     <div><span style="background:#e8af34"></span>Nifty (indexed)</div>
   </div>
-  <div class="chart-container">
-    <canvas id="growthChart"></canvas>
-  </div>
+  <div class="chart-container"><canvas id="growthChart"></canvas></div>
 </div>
 
 <div class="card">
   <div class="card-title">Weekly Deposits / Withdrawals</div>
-  <div class="chart-container-sm">
-    <canvas id="cashFlowChart"></canvas>
-  </div>
+  <div class="chart-container-sm"><canvas id="cashFlowChart"></canvas></div>
 </div>
 
 <script>
-function pn(v){ if(!v||v==='') return 0; return parseFloat(String(v).replace(/[^0-9.-]/g,''))||0; }
-function fr(n){ if(n===null||n===undefined) return '—'; const a=Math.abs(n); return a>=1e5?'₹'+(a/1e5).toFixed(2)+'L':'₹'+a.toLocaleString('en-IN'); }
+let ALL_ROWS = [];   // all rows oldest→newest, parsed dates
+let gchart = null, cfchart = null;
 
-async function init(){
-  const r = await fetch('data.json?v='+Date.now(), {cache:'no-store'});
-  const d = await r.json();
-  const rows = (d.account_growth||[]).filter(r=>r.date&&r.portfolio_size).reverse();
-  if(!rows.length){ document.body.innerHTML += '<p style="color:#7a8aaa">No data available.</p>'; return; }
+function pn(v){ if(!v||v==='') return 0; return parseFloat(String(v).replace(/[^0-9.-]/g,''))||0; }
+function fr(n){ if(n===null||n===undefined) return '—'; const a=Math.abs(n); const s=a>=1e5?'₹'+(a/1e5).toFixed(2)+'L':'₹'+a.toLocaleString('en-IN'); return n<0?'-'+s:s; }
+
+// Parse "4 May 2026" → Date object
+function parseDate(str){
+  if(!str) return null;
+  const d = new Date(str);
+  return isNaN(d) ? null : d;
+}
+
+function render(rows){
+  if(!rows.length) return;
 
   const labels   = rows.map(r=>r.date);
-  const rawVals  = rows.map(r=>pn(r.portfolio_size));
-  const cashFlow = rows.map(r=>pn(r.deposit_withdrawal));
-  const niftyRaw = rows.map(r=>pn(r.nifty_close));
+  const rawVals  = rows.map(r=>r.portfolio_size_n);
+  const cashFlow = rows.map(r=>r.deposit_withdrawal_n);
+  const niftyRaw = rows.map(r=>r.nifty_close_n);
 
+  // Adjusted series
   const adjVals = [rawVals[0]];
   for(let i=1;i<rawVals.length;i++){
     const base = rawVals[i-1] + cashFlow[i];
     adjVals[i] = adjVals[i-1] * (base>0 ? rawVals[i]/base : 1);
   }
 
+  // Nifty indexed to first value in this window
   const niftyStart = niftyRaw.find(v=>v>0);
   const niftyIndexed = niftyRaw.map(v=>v>0?(v/niftyStart)*rawVals[0]:null);
 
+  // KPIs
   const start=rawVals[0], current=rawVals[rawVals.length-1];
   const rawRet=((current-start)/start*100).toFixed(2);
   const adjRet=((adjVals[adjVals.length-1]-adjVals[0])/adjVals[0]*100).toFixed(2);
@@ -101,9 +159,8 @@ async function init(){
   const niftyRet=niftyLast?((niftyLast-rawVals[0])/rawVals[0]*100).toFixed(2):null;
   const alpha=niftyRet!==null?(+adjRet - +niftyRet).toFixed(2):null;
 
-  document.getElementById('g-start').textContent   = fr(start);
+  document.getElementById('g-start').textContent = fr(start);
   document.getElementById('g-current').textContent = fr(current);
-
   const rE=document.getElementById('g-raw-return');
   rE.textContent=rawRet+'%'; rE.className='kpi-val '+(+rawRet>=0?'up':'down');
   const aE=document.getElementById('g-adj-return');
@@ -114,26 +171,31 @@ async function init(){
   alE.textContent=alpha!==null?(alpha>0?'+':'')+alpha+'%':'—';
   alE.className='kpi-val '+(alpha!==null?(+alpha>=0?'up':'down'):'');
 
+  // Range label
+  document.getElementById('rangeLabel').textContent = rows.length + ' weeks · ' + labels[0] + ' → ' + labels[labels.length-1];
+
   const gc='rgba(45,54,80,1)', tc='#7a8aaa';
 
-  new Chart(document.getElementById('growthChart'), {
+  if(gchart) gchart.destroy();
+  gchart = new Chart(document.getElementById('growthChart'), {
     type:'line',
     data:{ labels, datasets:[
-      {label:'Raw Portfolio',   data:rawVals,      borderColor:'#4f98a3',backgroundColor:'rgba(79,152,163,0.07)',borderWidth:2,pointRadius:3,tension:0.3,fill:true},
-      {label:'Adjusted',        data:adjVals,      borderColor:'#6daa45',backgroundColor:'transparent',borderWidth:2,pointRadius:3,tension:0.3},
-      {label:'Nifty (indexed)', data:niftyIndexed, borderColor:'#e8af34',backgroundColor:'transparent',borderWidth:1.5,pointRadius:2,tension:0.3,borderDash:[5,4]}
+      {label:'Raw Portfolio',   data:rawVals,      borderColor:'#4f98a3',backgroundColor:'rgba(79,152,163,0.07)',borderWidth:2,pointRadius:rows.length>52?1:3,tension:0.3,fill:true},
+      {label:'Adjusted',        data:adjVals,      borderColor:'#6daa45',backgroundColor:'transparent',borderWidth:2,pointRadius:rows.length>52?1:3,tension:0.3},
+      {label:'Nifty (indexed)', data:niftyIndexed, borderColor:'#e8af34',backgroundColor:'transparent',borderWidth:1.5,pointRadius:rows.length>52?0:2,tension:0.3,borderDash:[5,4]}
     ]},
     options:{
       responsive:true, maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>' '+c.dataset.label+': '+fr(c.raw||0)}}},
       scales:{
-        x:{grid:{color:gc},ticks:{color:tc,maxRotation:45,font:{size:11}}},
+        x:{grid:{color:gc},ticks:{color:tc,maxRotation:45,font:{size:11},maxTicksLimit:12}},
         y:{grid:{color:gc},ticks:{color:tc,callback:v=>'₹'+(v/1e5).toFixed(1)+'L'}}
       }
     }
   });
 
-  new Chart(document.getElementById('cashFlowChart'), {
+  if(cfchart) cfchart.destroy();
+  cfchart = new Chart(document.getElementById('cashFlowChart'), {
     type:'bar',
     data:{ labels, datasets:[{
       label:'Cash Flow', data:cashFlow,
@@ -145,14 +207,79 @@ async function init(){
       responsive:true, maintainAspectRatio:false,
       plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fr(c.raw)}}},
       scales:{
-        x:{grid:{color:gc},ticks:{color:tc,font:{size:11}}},
+        x:{grid:{color:gc},ticks:{color:tc,font:{size:11},maxTicksLimit:12}},
         y:{grid:{color:gc},ticks:{color:tc,callback:v=>fr(v)}}
       }
     }
   });
 }
 
+function filterRows(from, to){
+  return ALL_ROWS.filter(r => (!from || r.date_obj >= from) && (!to || r.date_obj <= to));
+}
+
+function applyPreset(preset){
+  // Update active button
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  // Clear custom inputs
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+
+  const now = new Date();
+  let from = null;
+  if(preset==='3M'){ from = new Date(now); from.setMonth(from.getMonth()-3); }
+  else if(preset==='6M'){ from = new Date(now); from.setMonth(from.getMonth()-6); }
+  else if(preset==='1Y'){ from = new Date(now); from.setFullYear(from.getFullYear()-1); }
+
+  render(filterRows(from, null));
+}
+
+function applyCustomRange(){
+  const fromVal = document.getElementById('dateFrom').value;
+  const toVal   = document.getElementById('dateTo').value;
+  const from    = fromVal ? new Date(fromVal) : null;
+  const to      = toVal   ? new Date(toVal)   : null;
+
+  // Clear preset active state
+  document.querySelectorAll('.preset-btn').forEach(b=>b.classList.remove('active'));
+
+  const filtered = filterRows(from, to);
+  if(!filtered.length){ alert('No data in selected range.'); return; }
+  render(filtered);
+}
+
+async function init(){
+  const r = await fetch('data.json?v='+Date.now(), {cache:'no-store'});
+  const d = await r.json();
+  ALL_ROWS = (d.account_growth||[])
+    .filter(r=>r.date&&r.portfolio_size)
+    .reverse()
+    .map(r=>({
+      ...r,
+      date_obj: parseDate(r.date),
+      portfolio_size_n: pn(r.portfolio_size),
+      deposit_withdrawal_n: pn(r.deposit_withdrawal),
+      nifty_close_n: pn(r.nifty_close)
+    }));
+
+  if(!ALL_ROWS.length){ document.body.innerHTML += '<p style="color:#7a8aaa;margin-top:2rem">No data available.</p>'; return; }
+
+  // Set default date range in inputs to full range
+  const dates = ALL_ROWS.map(r=>r.date_obj).filter(Boolean);
+  const minD = new Date(Math.min(...dates));
+  const maxD = new Date(Math.max(...dates));
+  document.getElementById('dateFrom').value = minD.toISOString().split('T')[0];
+  document.getElementById('dateTo').value   = maxD.toISOString().split('T')[0];
+
+  render(ALL_ROWS);
+}
+
 init();
 </script>
 </body>
-</html>
+</html>"""
+
+with open('/home/user/output/growth.html', 'w') as f:
+    f.write(html)
+print(f"Done. {len(html)} chars")
