@@ -1,0 +1,35 @@
+name: Refresh Dev Dashboard Data
+on:
+  schedule:
+    - cron: '30 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: dev
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run refresh script
+        env:
+          GOOGLE_SHEET_KEY: ${{ secrets.GOOGLE_SHEET_KEY }}
+        run: python refresh_data.py
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add data.json
+          git commit -m "Auto-update dev dashboard data" || exit 0
+          git pull --rebase
+          git push
