@@ -130,10 +130,7 @@ if len(account_raw) > 1:
                 "nifty_close":         row[1] if len(row) > 1 else "",
                 "deposit_withdrawal":  row[2] if len(row) > 2 else "",
                 "portfolio_size":      row[3] if len(row) > 3 else "",
-                "weekly_change":      row[4] if len(row) > 4 else "",
-                "mtf_loan":           row[7] if len(row) > 7 else "",
-                "net_equity":         row[8] if len(row) > 8 else "",
-                "leverage_ratio":     row[9] if len(row) > 9 else ""
+                "weekly_change":      row[4] if len(row) > 4 else ""
             })
 
 data = {
