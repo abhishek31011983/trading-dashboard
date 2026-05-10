@@ -25,4 +25,5 @@ jobs:
           git config --global user.email 'action@github.com'
           git add data.json
           git commit -m "Auto-update dashboard data" || exit 0
+          git pull --rebase
           git push
