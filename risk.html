@@ -665,6 +665,145 @@ function updateChartTheme() {
 document.querySelectorAll('[data-filter]').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('[data-filter]').forEach(b => b.classList.remove('active'));
+    // ── Date filter buttons ────────────────────────────────────────────────────
+document.querySelectorAll('[data-date]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-date]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const val = btn.dataset.date;
+    if (val === 'all') {
+      activeDateFrom = null;
+      activeDateTo   = null;
+      document.getElementById('dateFrom').value = '';
+      document.getElementById('dateTo').value   = '';
+    } else {
+      const days = parseInt(val);
+      activeDateTo   = new Date();
+      activeDateFrom = new Date();
+      activeDateFrom.setDate(activeDateFrom.getDate() - days);
+      activeDateTo.setHours(23, 59, 59, 999);
+    }
+    renderAll();
+  });
+});
+
+document.getElementById('dateApply').addEventListener('click', () => {
+  const fromVal = document.getElementById('dateFrom').value;
+  const toVal   = document.getElementById('dateTo').value;
+  activeDateFrom = fromVal ? new Date(fromVal) : null;
+  activeDateTo   = toVal   ? new Date(toVal + 'T23:59:59') : null;
+  document.querySelectorAll('[data-date]').forEach(b => b.classList.remove('active'));
+  renderAll();
+});
+
+document.getElementById('dateClear').addEventListener('click', () => {
+  activeDateFrom = null;
+  activeDateTo   = null;
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value   = '';
+  document.querySelectorAll('[data-date]').forEach(b => b.classList.remove('active'));
+  document.querySelector('[data-date="all"]').classList.add('active');
+  renderAll();
+});
+
+function buildTable(trades) {
+  const tbody = document.getElementById('tradeTable');
+  tbody.innerHTML = '';
+  if (!trades.length) {
+    tbody.innerHTML = '<tr><td colspan="8" class="empty-notice">No entries match filters</td></tr>';
+    return;
+  }
+
+  const sorted = [...trades].sort((a, b) => {
+    let av, bv;
+    switch (tableSort.key) {
+      case 'index':
+        av = trades.indexOf(a);
+        bv = trades.indexOf(b);
+        break;
+      case 'entry_date':
+        av = a.dateObj ? a.dateObj.getTime() : 0;
+        bv = b.dateObj ? b.dateObj.getTime() : 0;
+        break;
+      case 'name':
+        av = (a.name || '').toLowerCase();
+        bv = (b.name || '').toLowerCase();
+        break;
+      case 'instrument':
+        av = (a.instrument || '').toLowerCase();
+        bv = (b.instrument || '').toLowerCase();
+        break;
+      case 'status':
+        av = (a.status || '').toLowerCase();
+        bv = (b.status || '').toLowerCase();
+        break;
+      case 'riskRs':
+      case 'riskBar':
+        av = a.riskRs || 0;
+        bv = b.riskRs || 0;
+        break;
+      case 'entryNum':
+        av = a.entryNum || 0;
+        bv = b.entryNum || 0;
+        break;
+      default:
+        av = 0;
+        bv = 0;
+    }
+    if (av < bv) return tableSort.dir === 'asc' ? -1 : 1;
+    if (av > bv) return tableSort.dir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  const maxRisk = Math.max(...sorted.map(t => t.riskRs || 0));
+  sorted.forEach((t, i) => {
+    const isCash = t.instrument === 'Cash';
+    const barWidth = maxRisk > 0 ? Math.round((t.riskRs / maxRisk) * 100) : 0;
+    const barClass = t.riskRs > 5000 ? 'high' : t.riskRs > 2000 ? 'med' : '';
+    const instrClass = isCash ? 'badge-cash' : 'badge-futures';
+    const instrLabel = isCash ? 'Cash' : 'F&O';
+    const statusClass = t.status === 'Open' ? 'badge-open' : 'badge-closed';
+    const entryLabel = t.entryNum === 1 ? '1st' : t.entryNum === 2 ? '2nd' : t.entryNum === 3 ? '3rd' : `${t.entryNum}th`;
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="color:var(--color-text-muted)">${i+1}</td>
+      <td style="white-space:nowrap">${t.entry_date}</td>
+      <td style="font-weight:500">${t.name}</td>
+      <td><span class="badge ${instrClass}">${instrLabel}</span></td>
+      <td><span class="badge ${statusClass}">${t.status}</span></td>
+      <td style="font-weight:600;font-variant-numeric:tabular-nums">${fmt(t.riskRs)}</td>
+      <td>
+        <div class="risk-bar-wrap">
+          <div class="risk-bar ${barClass}" style="width:${barWidth}px;max-width:120px"></div>
+        </div>
+      </td>
+      <td style="color:var(--color-text-muted)">${entryLabel} in ${t.name}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  document.querySelectorAll('th[data-sort]').forEach(th => {
+    const key = th.dataset.sort;
+    const baseText = th.textContent.replace(' ▲', '').replace(' ▼', '');
+    th.textContent = baseText + (tableSort.key === key ? (tableSort.dir === 'asc' ? ' ▲' : ' ▼') : '');
+  });
+}
+
+document.querySelectorAll('th[data-sort]').forEach(th => {
+  th.style.cursor = 'pointer';
+  th.addEventListener('click', () => {
+    const key = th.dataset.sort;
+    if (tableSort.key === key) {
+      tableSort.dir = tableSort.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+      tableSort.key = key;
+      tableSort.dir = key === 'entry_date' ? 'desc' : 'asc';
+    }
+    buildTable(getFiltered());
+  });
+});
+
     btn.classList.add('active');
     activeFilter = btn.dataset.filter;
     renderAll();
