@@ -316,6 +316,7 @@ let activeFilter = 'all';
 let activeStatus = 'all';
 let barMode = 'avg'; // avg or sum
 let tableSort = { key: 'entry_date', dir: 'desc' };
+let tableSort = { key: 'entry_date', dir: 'desc' };
 
 function parseNum(s) {
   if (!s && s !== 0) return null;
@@ -687,6 +688,20 @@ function renderAll() {
 function updateChartTheme() {
   renderAll();
 }
+
+document.querySelectorAll('th[data-sort]').forEach(th => {
+  th.style.cursor = 'pointer';
+  th.addEventListener('click', () => {
+    const key = th.dataset.sort;
+    if (tableSort.key === key) {
+      tableSort.dir = tableSort.dir === 'asc' ? 'desc' : 'asc';
+    } else {
+      tableSort.key = key;
+      tableSort.dir = key === 'entry_date' ? 'desc' : 'asc';
+    }
+    buildTable(getFiltered());
+  });
+});
 
 document.querySelectorAll('th[data-sort]').forEach(th => {
   th.style.cursor = 'pointer';
