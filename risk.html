@@ -227,6 +227,22 @@
     <div class="chart-card">
       <div class="chart-header">
         <div>
+          
+<!-- Date Filter -->
+<div class="controls" style="margin-bottom:var(--space-5)">
+  <span class="controls-label">Date Range</span>
+  <button class="filter-btn active" data-date="all">All Time</button>
+  <button class="filter-btn" data-date="7">Last 7 Days</button>
+  <button class="filter-btn" data-date="30">Last 30 Days</button>
+  <button class="filter-btn" data-date="90">Last 90 Days</button>
+  <span class="controls-label" style="margin-left:var(--space-4)">Custom</span>
+  <input type="date" id="dateFrom" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);padding:4px 8px;font-size:var(--text-xs)">
+  <span style="color:var(--color-text-muted);font-size:var(--text-xs)">to</span>
+  <input type="date" id="dateTo" style="background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);padding:4px 8px;font-size:var(--text-xs)">
+  <button class="filter-btn" id="dateApply">Apply</button>
+  <button class="filter-btn" id="dateClear">Clear</button>
+</div>
+
           <div class="chart-title">Absolute ₹ Risk per Entry — Over Time</div>
           <div class="chart-subtitle">Each dot = one trade entry. Dashed line = ₹1,500 reference target.</div>
         </div>
@@ -281,14 +297,14 @@
       <table>
         <thead>
           <tr>
-            <th>#</th>
-            <th>Date</th>
-            <th>Stock</th>
-            <th>Instrument</th>
-            <th>Status</th>
-            <th>₹ Risk</th>
-            <th>Risk Bar</th>
-            <th>Entry #</th>
+            <th># data-sort="index" style="cursor:pointer"</th>
+            <th>Date data-sort="entry_date" style="cursor:pointer"</th>
+            <th>Stock data-sort="name" style="cursor:pointer"</th>
+            <th>Instrument data-sort="instrument" style="cursor:pointer"</th>
+            <th>Status data-sort="status" style="cursor:pointer"</th>
+            <th>₹ Risk data-sort="riskRs" style="cursor:pointer"</th>
+            <th>Risk Bar data-sort="riskBar" style="cursor:pointer"</th>
+            <th>Entry # data-sort="entryNum" style="cursor:pointer"</th>
           </tr>
         </thead>
         <tbody id="tradeTable"></tbody>
@@ -319,6 +335,9 @@ let barMode = 'avg'; // avg or sum
 function parseNum(s) {
   if (!s && s !== 0) return null;
   const n = parseFloat(String(s).replace(/,/g,''));
+  let tableSort = { key: 'entry_date', dir: 'desc' };
+let activeDateFrom = null;
+let activeDateTo   = null;
   return isNaN(n) ? null : n;
 }
 
@@ -376,7 +395,14 @@ function getFiltered() {
     const instrOk = activeFilter === 'all' || t.instrument === activeFilter;
     const statusOk = activeStatus === 'all' || t.status === activeStatus;
     const validRisk = t.riskRs !== null && t.riskRs > 0;
-    return instrOk && statusOk && validRisk;
+    
+    let dateOk = true;
+    if (t.dateObj) {
+      if (activeDateFrom && t.dateObj < activeDateFrom) dateOk = false;
+      if (activeDateTo   && t.dateObj > activeDateTo)   dateOk = false;
+    }
+
+    return instrOk && statusOk && validRi && dateOksk;
   });
 }
 
