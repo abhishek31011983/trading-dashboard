@@ -200,24 +200,28 @@ table.t tbody tr:last-child{border-bottom:none;}
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>
       Analytics
     </button>
-          <button class="nav-btn" id="btn-rrdist" onclick="window.location.href='rrdist.html'">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20 C6 4 10 14 12 10 C14 6 18 16 22 4"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
-                    RR Distribution
-                  </button>
-        <button class="nav-btn" id="btn-growth" onclick="window.location.href='growth.html'">
+    <button class="nav-btn" id="btn-rrdist" onclick="window.location.href='rrdist.html'">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 20 C6 4 10 14 12 10 C14 6 18 16 22 4"/><line x1="2" y1="20" x2="22" y2="20"/></svg>
+      RR Distribution
+    </button>
+    <button class="nav-btn" id="btn-growth" onclick="window.location.href='growth.html'">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
       Account Growth
     </button>
-     <button class="nav-btn" id="btn-risk" onclick="window.location.href='risk.html'">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"></path>
-            <path d="M12 8v4"></path>
-            <path d="M12 16h.01"></path>
-          </svg>
-          Risk
-      </button>
+    <button class="nav-btn" id="btn-risk" onclick="window.location.href='risk.html'">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 3l7 4v5c0 5-3.5 8-7 9-3.5-1-7-4-7-9V7l7-4z"></path>
+        <path d="M12 8v4"></path>
+        <path d="M12 16h.01"></path>
+      </svg>
+      Risk
+    </button>
+    <button class="nav-btn" id="btn-charges" onclick="go('charges')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      Charges
+    </button>
   </div>
-       
+
   <div class="main">
     <div class="page active" id="overview">
       <div class="ph">
@@ -505,7 +509,7 @@ table.t tbody tr:last-child{border-bottom:none;}
           </div>
           <div style="font-size:var(--text-xs);font-weight:600;color:var(--muted);margin-bottom:var(--space-2)">WINNERS</div>
           <div id="fWin"></div>
-                   <div style="font-size:var(--text-xs);font-weight:600;color:var(--muted);margin:var(--space-4) 0 var(--space-2)">LOSERS</div>
+          <div style="font-size:var(--text-xs);font-weight:600;color:var(--muted);margin:var(--space-4) 0 var(--space-2)">LOSERS</div>
           <div id="fLoss"></div>
         </div>
       </div>
@@ -548,7 +552,7 @@ table.t tbody tr:last-child{border-bottom:none;}
       </div>
 
     <div class="page" id="growth">
-          <div class="ph">
+      <div class="ph">
         <h1>Account Growth</h1>
         <p>Portfolio equity curve vs Nifty benchmark</p>
       </div>
@@ -585,6 +589,109 @@ table.t tbody tr:last-child{border-bottom:none;}
       </div>
     </div>
     </div>
+
+    <!-- ── CHARGES PAGE ─────────────────────────────────────── -->
+    <div class="page" id="charges">
+      <div class="ph">
+        <h1>Charges Paid</h1>
+        <p>Brokerage, STT, GST and other charges — Cash vs F&amp;O</p>
+      </div>
+      <div class="filters" style="margin-bottom:var(--space-5);align-items:center;">
+        <label style="font-size:var(--text-xs);color:var(--muted);font-weight:600;">From</label>
+        <input class="finput" type="date" id="ch-from" onchange="renderCharges()" style="width:150px;">
+        <label style="font-size:var(--text-xs);color:var(--muted);font-weight:600;">To</label>
+        <input class="finput" type="date" id="ch-to" onchange="renderCharges()" style="width:150px;">
+        <button class="refresh-btn" onclick="chResetDates()">Reset</button>
+      </div>
+
+      <div class="kpi-panels">
+        <div class="kpi-panel cash-panel">
+          <div class="kpi-panel-header">
+            <div class="seg-dot dot-cash"></div>
+            <div class="kpi-panel-title">Cash Charges (Current FY)</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi">
+              <div class="kpi-lbl">Total Charges</div>
+              <div class="kpi-val down" id="ch-cash-total">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">As % of Gross P&amp;L</div>
+              <div class="kpi-val" id="ch-cash-pct">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Weekly Avg</div>
+              <div class="kpi-val" id="ch-cash-avg">—</div>
+            </div>
+          </div>
+        </div>
+        <div class="kpi-panel fo-panel">
+          <div class="kpi-panel-header">
+            <div class="seg-dot dot-fo"></div>
+            <div class="kpi-panel-title">F&amp;O Charges (Current FY)</div>
+          </div>
+          <div class="kpi-row">
+            <div class="kpi">
+              <div class="kpi-lbl">Total Charges</div>
+              <div class="kpi-val down" id="ch-fo-total">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">As % of Gross P&amp;L</div>
+              <div class="kpi-val" id="ch-fo-pct">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Weekly Avg</div>
+              <div class="kpi-val" id="ch-fo-avg">—</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card full" style="margin-bottom:var(--space-4)">
+        <div class="card-hdr">
+          <div class="card-title">Weekly Charges — Cash vs F&amp;O</div>
+        </div>
+        <div class="chart-wrap" style="height:260px"><canvas id="chargesWeeklyChart"></canvas></div>
+      </div>
+
+      <div class="card full" style="margin-bottom:var(--space-4)">
+        <div class="card-hdr">
+          <div class="card-title">Week-by-Week Breakdown</div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead>
+              <tr>
+                <th>Week Of</th>
+                <th>Cash P&amp;L</th>
+                <th>Cash Charges</th>
+                <th>Charges % of P&amp;L</th>
+                <th>F&amp;O P&amp;L</th>
+                <th>F&amp;O Charges</th>
+                <th>Charges % of P&amp;L</th>
+                <th>Total Charges</th>
+              </tr>
+            </thead>
+            <tbody id="chargesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card full">
+        <div class="card-hdr">
+          <div class="card-title">Financial Year Summary</div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead>
+              <tr><th>FY</th><th>Cash Charges</th><th>F&amp;O Charges</th><th>Total</th></tr>
+            </thead>
+            <tbody id="fyChargesBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 <script>
@@ -661,11 +768,14 @@ function go(name){
   const pg = document.getElementById(name);
   if (!pg) return;
   pg.classList.add('active');
-  document.getElementById('btn-'+name).classList.add('active');
+  const btn = document.getElementById('btn-'+name);
+  if (btn) btn.classList.add('active');
   if(name==='journal') renderJ();
   if(name==='openrisk') renderOpenRisk(window._D);
-  if(name==='analytics') renderAnalytics(); if(name==='rrdist') renderRR(); 
+  if(name==='analytics') renderAnalytics();
+  if(name==='rrdist') renderRR();
   if(name==='growth') setTimeout(renderGrowth, 80);
+  if(name==='charges') renderCharges();
 }
 
 // ── LOAD ───────────────────────────────────────────────────────
@@ -683,6 +793,7 @@ async function loadData(){
     if(active==='analytics') renderAnalytics();
     if(active==='rrdist') renderRR();
     if(active==='growth') setTimeout(renderGrowth, 80);
+    if(active==='charges') renderCharges();
     document.getElementById('lastUpd').innerHTML=
       `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Updated ${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
   }catch(e){
@@ -827,7 +938,7 @@ function renderJ(){
   const isFO=t=>t.instrument==='Futures/Options';
   const b=document.getElementById('jBody');
   if(!rows.length){b.innerHTML=`<tr><td colspan="13" style="text-align:center;padding:2rem;color:var(--muted)">No trades match</td></tr>`;return;}
-  
+
   b.innerHTML=rows.map(t=>{
     const pl=pn(t.total_pl);
     const plCls=pl===null?'neutral':pl>0?'up':'down';
@@ -969,7 +1080,7 @@ function renderAnalytics(){
     document.getElementById(winEl).innerHTML=mkList(w5,'up');
     document.getElementById(lossEl).innerHTML=mkList(l5,'down');
   }
-    topList('cWin','cLoss',cash);
+  topList('cWin','cLoss',cash);
   topList('fWin','fLoss',fo);
 
   function avgWinLoss(trades, prefix) {
@@ -989,7 +1100,9 @@ function renderAnalytics(){
   avgWinLoss(cash, 'c');
   avgWinLoss(fo, 'fo');
 }
+
 function renderRR(){const closed=T.filter(t=>t.status==='Closed');const isFO=t=>t.instrument==='Futures/Options';function buildRR(trades){return trades.map(t=>{const pl=pn(t.total_pl),risk=pn(t.total_risk);if(pl===null||!risk||risk===0)return null;return Math.round((pl/risk)*10)/10;}).filter(v=>v!==null);}function mkChart(cid,sid,rrs){const el=document.getElementById(cid);if(!el)return;if(!rrs.length){document.getElementById(sid).textContent='No data yet.';return;}const mn=Math.floor(Math.min(...rrs)),mx=Math.ceil(Math.max(...rrs)),bs=0.5,bk={};for(let b=mn;b<=mx;b+=bs)bk[b.toFixed(1)]=0;rrs.forEach(r=>{const k=(Math.floor(r/bs)*bs).toFixed(1);bk[k]=(bk[k]||0)+1;});const lb=Object.keys(bk).sort((a,b)=>+a-+b),vl=lb.map(l=>bk[l]);new Chart(el.getContext('2d'),{type:'bar',data:{labels:lb.map(l=>l+'R'),datasets:[{data:vl,backgroundColor:lb.map(l=>+l>=0?'rgba(59,130,246,0.7)':'rgba(244,63,94,0.5)'),borderColor:lb.map(l=>+l>=0?'#3b82f6':'#f43f5e'),borderWidth:1,borderRadius:3}]},options:{responsive:true,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+' trade'+(c.raw!==1?'s':'')}}},scales:{x:{grid:{color:gc()},ticks:{color:tc()}},y:{grid:{color:gc()},ticks:{color:tc(),stepSize:1},beginAtZero:true}}}});const av=(rrs.reduce((a,b)=>a+b,0)/rrs.length).toFixed(2),w=rrs.filter(r=>r>0).length,lo=rrs.filter(r=>r<=0).length;document.getElementById(sid).innerHTML='Avg: <b>'+av+'R</b> | Best: <b>'+Math.max(...rrs).toFixed(2)+'R</b> | Worst: <b>'+Math.min(...rrs).toFixed(2)+'R</b> | Winners: <b>'+w+'</b> | Losers: <b>'+lo+'</b>';}mkChart('rrCashChart','rrCashStats',buildRR(closed.filter(t=>!isFO(t))));mkChart('rrFoChart','rrFoStats',buildRR(closed.filter(t=>isFO(t))));}
+
 function renderGrowth(){
   const pg = document.getElementById('growth');
   if(!pg || !pg.classList.contains('active')){ return; }
@@ -1008,7 +1121,6 @@ function renderGrowth(){
   const cashFlow = data.map(r => pn2(r.deposit_withdrawal));
   const niftyRaw = data.map(r => pn2(r.nifty_close));
 
-  // Adjusted series — strips out deposits/withdrawals
   const adjVals = [rawVals[0]];
   for(let i = 1; i < rawVals.length; i++){
     const adjustedBase = rawVals[i-1] + cashFlow[i];
@@ -1016,11 +1128,9 @@ function renderGrowth(){
     adjVals[i]         = adjVals[i-1] * weekReturn;
   }
 
-  // Nifty indexed to starting portfolio value
   const niftyStart   = niftyRaw.find(v => v > 0);
   const niftyIndexed = niftyRaw.map(v => v > 0 ? (v / niftyStart) * rawVals[0] : null);
 
-  // KPIs
   const start  = rawVals[0];
   const current= rawVals[rawVals.length - 1];
   const rawRet = ((current - start) / start * 100).toFixed(2);
@@ -1094,6 +1204,165 @@ function renderGrowth(){
     }
   });
 }
+
+// ── CHARGES ────────────────────────────────────────────────────
+function parseWeekDate(str) {
+  // Parses strings like "25 May 2026" or "1 Apr 2026"
+  if (!str) return null;
+  const d = new Date(str);
+  return isNaN(d) ? null : d;
+}
+
+function chResetDates() {
+  document.getElementById('ch-from').value = '';
+  document.getElementById('ch-to').value = '';
+  renderCharges();
+}
+
+function renderCharges() {
+  const d = window._D;
+  if (!d || !d.charges) {
+    document.getElementById('chargesBody').innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:2rem">No charges data — run refresh_data.py to populate</td></tr>';
+    return;
+  }
+
+  // Date filter
+  const fromVal = document.getElementById('ch-from').value;
+  const toVal   = document.getElementById('ch-to').value;
+  const fromDate = fromVal ? new Date(fromVal) : null;
+  const toDate   = toVal   ? new Date(toVal)   : null;
+
+  const allWeekly = (d.charges.weekly || []).filter(w => w.week !== 'Grand Total');
+
+  // Set default date inputs to cover full data range on first load
+  if (!fromVal && !toVal && allWeekly.length) {
+    const dates = allWeekly.map(w => parseWeekDate(w.week)).filter(Boolean);
+    if (dates.length) {
+      const minD = new Date(Math.min(...dates));
+      const maxD = new Date(Math.max(...dates));
+      document.getElementById('ch-from').value = minD.toISOString().slice(0,10);
+      document.getElementById('ch-to').value   = maxD.toISOString().slice(0,10);
+    }
+  }
+
+  const weekly = allWeekly.filter(w => {
+    const wd = parseWeekDate(w.week);
+    if (!wd) return true;
+    if (fromDate && wd < fromDate) return false;
+    if (toDate   && wd > toDate)   return false;
+    return true;
+  });
+
+  const fyData = d.charges.fy || [];
+
+  function pnC(v) {
+    if (!v || v === '') return 0;
+    return parseFloat(String(v).replace(/[₹,\s]/g, '').replace('(', '-').replace(')', '')) || 0;
+  }
+
+  // Totals: if date filter active, sum from filtered weekly; otherwise use FY row
+  const fromVal2 = document.getElementById('ch-from').value;
+  const toVal2   = document.getElementById('ch-to').value;
+  const dateFiltered = fromVal2 || toVal2;
+
+  let cashTotal, foTotal;
+  if (dateFiltered) {
+    cashTotal = weekly.reduce((s, w) => s + Math.abs(pnC(w.cash_charges)), 0);
+    foTotal   = weekly.reduce((s, w) => s + Math.abs(pnC(w.fo_charges)),   0);
+  } else {
+    const curFY = fyData.find(r => Math.abs(pnC(r.total)) > 0) || {};
+    cashTotal = Math.abs(pnC(curFY.cash_charges));
+    foTotal   = Math.abs(pnC(curFY.fo_charges));
+  }
+
+  const weeksWithCash = weekly.filter(w => pnC(w.cash_charges) !== 0).length || 1;
+  const weeksWithFO   = weekly.filter(w => pnC(w.fo_charges)   !== 0).length || 1;
+
+  let grossCash = 0, grossFO = 0;
+  weekly.forEach(w => {
+    const cp = pnC(w.cash_profit); if (cp > 0) grossCash += cp;
+    const fp = pnC(w.fo_profit);   if (fp > 0) grossFO   += fp;
+  });
+  const cashPct = grossCash ? ((cashTotal / grossCash) * 100).toFixed(1) + '%' : '—';
+  const foPct   = grossFO   ? ((foTotal   / grossFO)   * 100).toFixed(1) + '%' : '—';
+
+  document.getElementById('ch-cash-total').textContent = fr(cashTotal);
+  document.getElementById('ch-fo-total').textContent   = fr(foTotal);
+  document.getElementById('ch-cash-pct').textContent   = cashPct;
+  document.getElementById('ch-fo-pct').textContent     = foPct;
+  document.getElementById('ch-cash-avg').textContent   = fr(cashTotal / weeksWithCash);
+  document.getElementById('ch-fo-avg').textContent     = fr(foTotal   / weeksWithFO);
+
+  // Weekly chart
+  dc('chargesWeeklyChart');
+  const dark = isDark();
+  const labels = weekly.map(w => w.week);
+  const cashVals = weekly.map(w => Math.abs(pnC(w.cash_charges)));
+  const foVals   = weekly.map(w => Math.abs(pnC(w.fo_charges)));
+  CI['chargesWeeklyChart'] = new Chart(document.getElementById('chargesWeeklyChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        { label: 'Cash', data: cashVals, backgroundColor: dark ? 'rgba(59,130,246,0.8)' : 'rgba(37,99,235,0.8)', borderRadius: 4 },
+        { label: 'F&O',  data: foVals,   backgroundColor: dark ? 'rgba(167,139,250,0.8)' : 'rgba(124,58,237,0.8)', borderRadius: 4 }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, padding: 12 } } },
+      scales: {
+        x: { grid: { color: gc() }, ticks: { color: tc() } },
+        y: { grid: { color: gc() }, ticks: { color: tc(), callback: v => '₹' + (v >= 1000 ? (v/1000).toFixed(1) + 'K' : v) }, beginAtZero: true }
+      }
+    }
+  });
+
+  // Weekly table
+  const tbody = document.getElementById('chargesBody');
+  if (!weekly.length) {
+    tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:2rem">No weekly data yet</td></tr>';
+  } else {
+    tbody.innerHTML = weekly.map(w => {
+      const cc = Math.abs(pnC(w.cash_charges));
+      const fc = Math.abs(pnC(w.fo_charges));
+      const cp = pnC(w.cash_profit);
+      const fp = pnC(w.fo_profit);
+      const cpct = cp !== 0 ? ((cc / Math.abs(cp)) * 100).toFixed(1) + '%' : '—';
+      const fpct = fp !== 0 ? ((fc / Math.abs(fp)) * 100).toFixed(1) + '%' : '—';
+      return `<tr>
+        <td style="font-weight:600">${w.week}</td>
+        <td class="mono ${cp >= 0 ? 'up' : 'down'}">${cp !== 0 ? fr(cp, true) : '—'}</td>
+        <td class="mono down">${cc ? fr(cc) : '—'}</td>
+        <td class="mono">${cpct}</td>
+        <td class="mono ${fp >= 0 ? 'up' : 'down'}">${fp !== 0 ? fr(fp, true) : '—'}</td>
+        <td class="mono down">${fc ? fr(fc) : '—'}</td>
+        <td class="mono">${fpct}</td>
+        <td class="mono down" style="font-weight:600">${(cc + fc) ? fr(cc + fc) : '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  // FY table
+  const fyTbody = document.getElementById('fyChargesBody');
+  if (!fyData.length) {
+    fyTbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:2rem">No data</td></tr>';
+  } else {
+    fyTbody.innerHTML = fyData.map(r => {
+      const cc = Math.abs(pnC(r.cash_charges));
+      const fc = Math.abs(pnC(r.fo_charges));
+      const tot = Math.abs(pnC(r.total));
+      const hasData = cc || fc || tot;
+      return `<tr${!hasData ? ' style="color:var(--muted)"' : ''}>
+        <td style="font-weight:600">${r.fy}</td>
+        <td class="mono${cc ? ' down' : ''}">${cc ? fr(cc) : '—'}</td>
+        <td class="mono${fc ? ' down' : ''}">${fc ? fr(fc) : '—'}</td>
+        <td class="mono${tot ? ' down' : ''}" style="font-weight:700">${tot ? fr(tot) : '—'}</td>
+      </tr>`;
+    }).join('');
+  }
+}
+
   document.addEventListener('DOMContentLoaded', loadData);
 </script>
 </body>
