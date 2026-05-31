@@ -15,6 +15,7 @@ sheet = client.open_by_key('1hqg0c7PGiEaxC-PpOuyCSfivwyhPKgS0mpbNIa55Zio')
 dash_tab = sheet.worksheet("dashboard")
 all_trades_tab = sheet.worksheet("All Trades")
 account_size_tab = sheet.worksheet("Account Size")
+charges_tab = sheet.worksheet("Charges")
 
 # 3. Fetch Data
 # Main Metrics
@@ -102,6 +103,47 @@ if len(account_raw) > 1:
                 "portfolio_size": row[3] if len(row) > 3 else ""
             })
 
+# Charges tab — weekly breakdown and FY totals
+charges_raw = charges_tab.get_all_values()
+weekly_charges = []
+fy_charges = []
+
+for i, row in enumerate(charges_raw):
+    if not row:
+        continue
+    # Weekly "Week of" table
+    # Columns: Week of | Net Profit | Cash Profit | Cash Charges | Charges % | FnO Profit | FnO Charges | FnO Charges % | ...
+    if row[0] == 'Week of':
+        for data_row in charges_raw[i + 1:]:
+            if not data_row or not data_row[0]:
+                break
+            weekly_charges.append({
+                "week": data_row[0],
+                "net_profit": data_row[1] if len(data_row) > 1 else "",
+                "cash_profit": data_row[2] if len(data_row) > 2 else "",
+                "cash_charges": data_row[3] if len(data_row) > 3 else "",
+                "fo_profit": data_row[5] if len(data_row) > 5 else "",
+                "fo_charges": data_row[6] if len(data_row) > 6 else "",
+            })
+        break  # only one such table expected
+
+for i, row in enumerate(charges_raw):
+    if not row:
+        continue
+    # FY totals table
+    # Columns: Financial Year | Cash Charges | F&O Charges | Total
+    if row[0] == 'Financial Year':
+        for data_row in charges_raw[i + 1:]:
+            if not data_row or not data_row[0]:
+                break
+            fy_charges.append({
+                "fy": data_row[0],
+                "cash_charges": data_row[1] if len(data_row) > 1 else "",
+                "fo_charges": data_row[2] if len(data_row) > 2 else "",
+                "total": data_row[3] if len(data_row) > 3 else "",
+            })
+        break
+
 data = {
     "metrics": metrics,
     "charts": {
@@ -114,6 +156,10 @@ data = {
         "derivatives": derivatives_risk_data
     },
     "account_growth": account_data,
+    "charges": {
+        "weekly": weekly_charges,
+        "fy": fy_charges
+    },
     "headers": headers
 }
 
