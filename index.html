@@ -1232,7 +1232,7 @@ function renderCharges() {
   const fromDate = fromVal ? new Date(fromVal) : null;
   const toDate   = toVal   ? new Date(toVal)   : null;
 
-  const allWeekly = d.charges.weekly || [];
+  const allWeekly = (d.charges.weekly || []).slice().reverse(); // oldest first
 
   // Set default date inputs to cover full data range on first load
   if (!fromVal && !toVal && allWeekly.length) {
@@ -1260,20 +1260,9 @@ function renderCharges() {
     return parseFloat(String(v).replace(/[₹,\s]/g, '').replace('(', '-').replace(')', '')) || 0;
   }
 
-  // Totals: if date filter active, sum from filtered weekly; otherwise use FY row
-  const fromVal2 = document.getElementById('ch-from').value;
-  const toVal2   = document.getElementById('ch-to').value;
-  const dateFiltered = fromVal2 || toVal2;
-
-  let cashTotal, foTotal;
-  if (dateFiltered) {
-    cashTotal = weekly.reduce((s, w) => s + Math.abs(pnC(w.cash_charges)), 0);
-    foTotal   = weekly.reduce((s, w) => s + Math.abs(pnC(w.fo_charges)),   0);
-  } else {
-    const curFY = fyData.find(r => Math.abs(pnC(r.total)) > 0) || {};
-    cashTotal = Math.abs(pnC(curFY.cash_charges));
-    foTotal   = Math.abs(pnC(curFY.fo_charges));
-  }
+  // Totals: always sum from filtered weekly data (accurate regardless of FY table)
+  const cashTotal = weekly.reduce((s, w) => s + Math.abs(pnC(w.cash_charges)), 0);
+  const foTotal   = weekly.reduce((s, w) => s + Math.abs(pnC(w.fo_charges)),   0);
 
   const weeksWithCash = weekly.filter(w => pnC(w.cash_charges) !== 0).length || 1;
   const weeksWithFO   = weekly.filter(w => pnC(w.fo_charges)   !== 0).length || 1;
