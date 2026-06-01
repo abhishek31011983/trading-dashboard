@@ -111,8 +111,6 @@ fy_charges = []
 for i, row in enumerate(charges_raw):
     if not row:
         continue
-    # Weekly "Week of" table
-    # Columns: Week of | Net Profit | Cash Profit | Cash Charges | Charges % | FnO Profit | FnO Charges | FnO Charges % | ...
     if row[0] == 'Week of':
         for data_row in charges_raw[i + 1:]:
             if not data_row or not data_row[0]:
@@ -125,13 +123,11 @@ for i, row in enumerate(charges_raw):
                 "fo_profit": data_row[5] if len(data_row) > 5 else "",
                 "fo_charges": data_row[6] if len(data_row) > 6 else "",
             })
-        break  # only one such table expected
+        break
 
 for i, row in enumerate(charges_raw):
     if not row:
         continue
-    # FY totals table
-    # Columns: Financial Year | Cash Charges | F&O Charges | Total
     if row[0] == 'Financial Year':
         for data_row in charges_raw[i + 1:]:
             if not data_row or not data_row[0]:
