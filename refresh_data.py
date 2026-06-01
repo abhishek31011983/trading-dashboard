@@ -103,42 +103,34 @@ if len(account_raw) > 1:
                 "portfolio_size": row[3] if len(row) > 3 else ""
             })
 
-# Charges tab — weekly breakdown and FY totals
+# Charges tab — two side-by-side tables
+# Annual Charges:  cols A-D  (idx 0-3):  Financial Year | Cash Charges | F&O Charges | Total
+# Weekly Charges:  cols F-K  (idx 5-10): Week Start | Week End | Cash Charges | F&O Charges | Portfolio Size | Charges % of Portfolio
 charges_raw = charges_tab.get_all_values()
 weekly_charges = []
 fy_charges = []
 
-for i, row in enumerate(charges_raw):
+for row in charges_raw[1:]:  # skip header row
     if not row:
         continue
-    if row[0] == 'Week of':
-        for data_row in charges_raw[i + 1:]:
-            if not data_row or not data_row[0]:
-                break
-            weekly_charges.append({
-                "week": data_row[0],
-                "net_profit": data_row[1] if len(data_row) > 1 else "",
-                "cash_profit": data_row[2] if len(data_row) > 2 else "",
-                "cash_charges": data_row[3] if len(data_row) > 3 else "",
-                "fo_profit": data_row[5] if len(data_row) > 5 else "",
-                "fo_charges": data_row[6] if len(data_row) > 6 else "",
-            })
-        break
-
-for i, row in enumerate(charges_raw):
-    if not row:
-        continue
-    if row[0] == 'Financial Year':
-        for data_row in charges_raw[i + 1:]:
-            if not data_row or not data_row[0]:
-                break
-            fy_charges.append({
-                "fy": data_row[0],
-                "cash_charges": data_row[1] if len(data_row) > 1 else "",
-                "fo_charges": data_row[2] if len(data_row) > 2 else "",
-                "total": data_row[3] if len(data_row) > 3 else "",
-            })
-        break
+    # Annual Charges (column A)
+    if row[0] and row[0] != 'Financial Year':
+        fy_charges.append({
+            "fy": row[0],
+            "cash_charges": row[1] if len(row) > 1 else "",
+            "fo_charges": row[2] if len(row) > 2 else "",
+            "total": row[3] if len(row) > 3 else "",
+        })
+    # Weekly Charges (column F = index 5)
+    if len(row) > 5 and row[5] and row[5] != 'Week Start':
+        weekly_charges.append({
+            "week_start": row[5],
+            "week_end": row[6] if len(row) > 6 else "",
+            "cash_charges": row[7] if len(row) > 7 else "",
+            "fo_charges": row[8] if len(row) > 8 else "",
+            "portfolio_size": row[9] if len(row) > 9 else "",
+            "charges_pct": row[10] if len(row) > 10 else "",
+        })
 
 data = {
     "metrics": metrics,
