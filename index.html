@@ -616,12 +616,12 @@ table.t tbody tr:last-child{border-bottom:none;}
               <div class="kpi-val down" id="ch-cash-total">—</div>
             </div>
             <div class="kpi">
-              <div class="kpi-lbl">As % of Gross P&amp;L</div>
-              <div class="kpi-val" id="ch-cash-pct">—</div>
-            </div>
-            <div class="kpi">
               <div class="kpi-lbl">Weekly Avg</div>
               <div class="kpi-val" id="ch-cash-avg">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Cumulative % of Portfolio</div>
+              <div class="kpi-val down" id="ch-cash-cum-pct">—</div>
             </div>
           </div>
         </div>
@@ -636,12 +636,12 @@ table.t tbody tr:last-child{border-bottom:none;}
               <div class="kpi-val down" id="ch-fo-total">—</div>
             </div>
             <div class="kpi">
-              <div class="kpi-lbl">As % of Gross P&amp;L</div>
-              <div class="kpi-val" id="ch-fo-pct">—</div>
-            </div>
-            <div class="kpi">
               <div class="kpi-lbl">Weekly Avg</div>
               <div class="kpi-val" id="ch-fo-avg">—</div>
+            </div>
+            <div class="kpi">
+              <div class="kpi-lbl">Cumulative % of Portfolio</div>
+              <div class="kpi-val down" id="ch-fo-cum-pct">—</div>
             </div>
           </div>
         </div>
@@ -662,14 +662,14 @@ table.t tbody tr:last-child{border-bottom:none;}
           <table class="t">
             <thead>
               <tr>
-                <th>Week Of</th>
-                <th>Cash P&amp;L</th>
+                <th>Week Start</th>
+                <th>Week End</th>
                 <th>Cash Charges</th>
-                <th>Charges % of P&amp;L</th>
-                <th>F&amp;O P&amp;L</th>
                 <th>F&amp;O Charges</th>
-                <th>Charges % of P&amp;L</th>
                 <th>Total Charges</th>
+                <th>Portfolio Size</th>
+                <th>Weekly % of Portfolio</th>
+                <th>Cumulative %</th>
               </tr>
             </thead>
             <tbody id="chargesBody"></tbody>
@@ -1232,11 +1232,11 @@ function renderCharges() {
   const fromDate = fromVal ? new Date(fromVal) : null;
   const toDate   = toVal   ? new Date(toVal)   : null;
 
-  const allWeekly = (d.charges.weekly || []).filter(w => w.week !== 'Grand Total');
+  const allWeekly = d.charges.weekly || [];
 
   // Set default date inputs to cover full data range on first load
   if (!fromVal && !toVal && allWeekly.length) {
-    const dates = allWeekly.map(w => parseWeekDate(w.week)).filter(Boolean);
+    const dates = allWeekly.map(w => parseWeekDate(w.week_start)).filter(Boolean);
     if (dates.length) {
       const minD = new Date(Math.min(...dates));
       const maxD = new Date(Math.max(...dates));
@@ -1246,7 +1246,7 @@ function renderCharges() {
   }
 
   const weekly = allWeekly.filter(w => {
-    const wd = parseWeekDate(w.week);
+    const wd = parseWeekDate(w.week_start);
     if (!wd) return true;
     if (fromDate && wd < fromDate) return false;
     if (toDate   && wd > toDate)   return false;
@@ -1278,25 +1278,37 @@ function renderCharges() {
   const weeksWithCash = weekly.filter(w => pnC(w.cash_charges) !== 0).length || 1;
   const weeksWithFO   = weekly.filter(w => pnC(w.fo_charges)   !== 0).length || 1;
 
-  let grossCash = 0, grossFO = 0;
+  // Cumulative % = sum of each week's charges_pct (precise method)
+  // Parse pct strings like "0.2%" → 0.2
+  function parsePct(v) {
+    if (!v || v === '') return 0;
+    return parseFloat(String(v).replace('%','').trim()) || 0;
+  }
+  // Split cumulative between Cash and F&O proportionally per week
+  let cumCashPct = 0, cumFOPct = 0, cumTotalPct = 0;
   weekly.forEach(w => {
-    const cp = pnC(w.cash_profit); if (cp > 0) grossCash += cp;
-    const fp = pnC(w.fo_profit);   if (fp > 0) grossFO   += fp;
+    const cc = Math.abs(pnC(w.cash_charges));
+    const fc = Math.abs(pnC(w.fo_charges));
+    const tot = cc + fc;
+    const weekPct = parsePct(w.charges_pct);
+    if (tot > 0) {
+      cumCashPct += weekPct * (cc / tot);
+      cumFOPct   += weekPct * (fc / tot);
+    }
+    cumTotalPct += weekPct;
   });
-  const cashPct = grossCash ? ((cashTotal / grossCash) * 100).toFixed(1) + '%' : '—';
-  const foPct   = grossFO   ? ((foTotal   / grossFO)   * 100).toFixed(1) + '%' : '—';
 
-  document.getElementById('ch-cash-total').textContent = fr(cashTotal);
-  document.getElementById('ch-fo-total').textContent   = fr(foTotal);
-  document.getElementById('ch-cash-pct').textContent   = cashPct;
-  document.getElementById('ch-fo-pct').textContent     = foPct;
-  document.getElementById('ch-cash-avg').textContent   = fr(cashTotal / weeksWithCash);
-  document.getElementById('ch-fo-avg').textContent     = fr(foTotal   / weeksWithFO);
+  document.getElementById('ch-cash-total').textContent    = fr(cashTotal);
+  document.getElementById('ch-fo-total').textContent      = fr(foTotal);
+  document.getElementById('ch-cash-avg').textContent      = fr(cashTotal / weeksWithCash);
+  document.getElementById('ch-fo-avg').textContent        = fr(foTotal   / weeksWithFO);
+  document.getElementById('ch-cash-cum-pct').textContent  = cumCashPct  ? cumCashPct.toFixed(2)  + '%' : '—';
+  document.getElementById('ch-fo-cum-pct').textContent    = cumFOPct    ? cumFOPct.toFixed(2)    + '%' : '—';
 
   // Weekly chart
   dc('chargesWeeklyChart');
   const dark = isDark();
-  const labels = weekly.map(w => w.week);
+  const labels = weekly.map(w => w.week_start);
   const cashVals = weekly.map(w => Math.abs(pnC(w.cash_charges)));
   const foVals   = weekly.map(w => Math.abs(pnC(w.fo_charges)));
   CI['chargesWeeklyChart'] = new Chart(document.getElementById('chargesWeeklyChart'), {
@@ -1323,22 +1335,22 @@ function renderCharges() {
   if (!weekly.length) {
     tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:2rem">No weekly data yet</td></tr>';
   } else {
+    let runningPct = 0;
     tbody.innerHTML = weekly.map(w => {
-      const cc = Math.abs(pnC(w.cash_charges));
-      const fc = Math.abs(pnC(w.fo_charges));
-      const cp = pnC(w.cash_profit);
-      const fp = pnC(w.fo_profit);
-      const cpct = cp !== 0 ? ((cc / Math.abs(cp)) * 100).toFixed(1) + '%' : '—';
-      const fpct = fp !== 0 ? ((fc / Math.abs(fp)) * 100).toFixed(1) + '%' : '—';
+      const cc  = Math.abs(pnC(w.cash_charges));
+      const fc  = Math.abs(pnC(w.fo_charges));
+      const ps  = pnC(w.portfolio_size);
+      const wp  = parsePct(w.charges_pct);
+      runningPct += wp;
       return `<tr>
-        <td style="font-weight:600">${w.week}</td>
-        <td class="mono ${cp >= 0 ? 'up' : 'down'}">${cp !== 0 ? fr(cp, true) : '—'}</td>
+        <td style="font-weight:600">${w.week_start}</td>
+        <td>${w.week_end || '—'}</td>
         <td class="mono down">${cc ? fr(cc) : '—'}</td>
-        <td class="mono">${cpct}</td>
-        <td class="mono ${fp >= 0 ? 'up' : 'down'}">${fp !== 0 ? fr(fp, true) : '—'}</td>
         <td class="mono down">${fc ? fr(fc) : '—'}</td>
-        <td class="mono">${fpct}</td>
-        <td class="mono down" style="font-weight:600">${(cc + fc) ? fr(cc + fc) : '—'}</td>
+        <td class="mono down" style="font-weight:700">${(cc + fc) ? fr(cc + fc) : '—'}</td>
+        <td class="mono">${ps ? fr(ps) : '—'}</td>
+        <td class="mono down">${wp ? wp.toFixed(1) + '%' : '—'}</td>
+        <td class="mono down">${runningPct ? runningPct.toFixed(2) + '%' : '—'}</td>
       </tr>`;
     }).join('');
   }
