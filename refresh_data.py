@@ -1,5 +1,6 @@
 import os
 import json
+import datetime
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -69,7 +70,8 @@ for row in all_trades_raw[1:]:
             "mtf_interest": row[24] if len(row) > 24 else "",
             "rr_achieved": row[25] if len(row) > 25 else "",
             "comments": row[26] if len(row) > 26 else "",
-            "market_conditions": row[27] if len(row) > 27 else ""
+            "market_conditions": row[27] if len(row) > 27 else "",
+            "category": row[49] if len(row) > 49 else "Swing Trade"
         })
 
 # Open Risk tabs
@@ -102,6 +104,40 @@ if len(account_raw) > 1:
                 "deposit_withdrawal": row[2] if len(row) > 2 else "",
                 "portfolio_size": row[3] if len(row) > 3 else ""
             })
+
+# Category snapshots — weekly portfolio value by category
+def parse_num(v):
+    if not v: return 0.0
+    try: return float(str(v).replace(',','').replace('₹','').replace('(', '-').replace(')', '').strip())
+    except: return 0.0
+
+# Read existing snapshots from data.json
+existing_snapshots = []
+try:
+    with open('data.json', 'r') as f:
+        existing_data = json.load(f)
+        existing_snapshots = existing_data.get('category_snapshots', [])
+except:
+    pass
+
+today_str = datetime.date.today().isoformat()
+cat_snapshot = {}
+for trade in trades:
+    if trade['status'] != 'Open':
+        continue
+    cat = trade.get('category', '') or 'Swing Trade'
+    if cat not in cat_snapshot:
+        cat_snapshot[cat] = {'deployed': 0.0, 'current_value': 0.0}
+    shares = parse_num(trade.get('shares', 0))
+    entry_price = parse_num(trade.get('entry_price', 0))
+    current_price = parse_num(trade.get('current_price', 0))
+    cat_snapshot[cat]['deployed'] += round(shares * entry_price, 2)
+    cat_snapshot[cat]['current_value'] += round(shares * current_price, 2)
+
+today_snapshot = {'date': today_str, 'categories': cat_snapshot}
+existing_snapshots = [s for s in existing_snapshots if s['date'] != today_str]
+existing_snapshots.append(today_snapshot)
+existing_snapshots = sorted(existing_snapshots, key=lambda x: x['date'])
 
 # Charges tab — two side-by-side tables
 # Annual Charges:  cols A-D  (idx 0-3):  Financial Year | Cash Charges | F&O Charges | Total
@@ -148,6 +184,7 @@ data = {
         "weekly": weekly_charges,
         "fy": fy_charges
     },
+    "category_snapshots": existing_snapshots,
     "headers": headers
 }
 
