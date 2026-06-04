@@ -1279,6 +1279,7 @@ const CAT_COLORS = {
 };
 const CAT_ORDER = ['Swing Trade','Investment - Stocks','Investment - ETFs','Investment - REITs','Investment - Gold'];
 const INV_CATS = ['Investment - Stocks','Investment - ETFs','Investment - REITs','Investment - Gold'];
+const CAT_HIDDEN = ['Futures','Futures/Options']; // excluded from Category page
 
 let _catPreset = 'today';
 
@@ -1419,6 +1420,7 @@ function renderCategory() {
   // KPI cards
   const grid = document.getElementById('cat-kpi-grid');
   grid.innerHTML = allCats.filter(c => {
+    if (CAT_HIDDEN.includes(c)) return false;
     const s = catStats[c];
     return s && (s.deployed > 0 || s.realisedPnl !== 0 || s.openCount > 0);
   }).map(cat => {
@@ -1428,13 +1430,16 @@ function renderCategory() {
     const xirrRate = isInv ? buildXIRR(trades, cat) : null;
     const xirrStr  = xirrRate === 'early' ? 'Too early' : xirrRate !== null ? `${(xirrRate*100).toFixed(1)}%` : '—';
     const xirrColor = xirrRate === 'early' ? 'var(--muted)' : xirrRate !== null ? (xirrRate >= 0 ? 'var(--success)' : 'var(--error)') : 'var(--muted)';
+    // compact formatter — no decimals, L suffix for ≥1L
+    const fc = n => { if(n===null||n===undefined) return '—'; const a=Math.abs(n),s=a>=1e5?'₹'+(a/1e5).toFixed(2)+'L':'₹'+Math.round(a).toLocaleString('en-IN'); return (n<0?'-':'')+s; };
+    const fcs = (n,sign=false) => { if(n===null||n===undefined) return '—'; const a=Math.abs(n),s=a>=1e5?'₹'+(a/1e5).toFixed(2)+'L':'₹'+Math.round(a).toLocaleString('en-IN'); if(sign) return (n<0?'-':'+')+s; return (n<0?'-':'')+s; };
     return `<div class="cat-kpi-card" style="border-top-color:${col}">
       <div class="cat-kpi-name" style="color:${col}">${cat}</div>
       <div class="cat-kpi-row">
-        <div class="kpi"><div class="kpi-lbl">Deployed</div><div class="kpi-val">${fr(s.deployed)}</div></div>
-        <div class="kpi"><div class="kpi-lbl">Mkt Value</div><div class="kpi-val">${fr(s.currentVal)}</div></div>
-        <div class="kpi"><div class="kpi-lbl">Unrealised</div><div class="kpi-val ${s.unrealisedPnl>=0?'up':'down'}">${fr(s.unrealisedPnl,true)}</div></div>
-        <div class="kpi"><div class="kpi-lbl">Realised</div><div class="kpi-val ${s.realisedPnl>=0?'up':'down'}">${fr(s.realisedPnl,true)}</div></div>
+        <div class="kpi"><div class="kpi-lbl">Deployed</div><div class="kpi-val">${fc(s.deployed)}</div></div>
+        <div class="kpi"><div class="kpi-lbl">Mkt Value</div><div class="kpi-val">${fc(s.currentVal)}</div></div>
+        <div class="kpi"><div class="kpi-lbl">Unrealised</div><div class="kpi-val ${s.unrealisedPnl>=0?'up':'down'}">${fcs(s.unrealisedPnl,true)}</div></div>
+        <div class="kpi"><div class="kpi-lbl">Realised</div><div class="kpi-val ${s.realisedPnl>=0?'up':'down'}">${fcs(s.realisedPnl,true)}</div></div>
       </div>
       ${isInv ? `<div class="cat-xirr"><span>XIRR</span><span style="font-family:var(--font-mono);font-weight:700;color:${xirrColor}">${xirrStr}</span></div>` : ''}
     </div>`;
