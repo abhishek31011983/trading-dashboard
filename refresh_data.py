@@ -92,7 +92,7 @@ if len(derivatives_risk_raw) > 1:
         if len(row) >= 2 and row[0]:
             derivatives_risk_data.append({"symbol": row[0], "open_risk": row[1] if len(row) > 1 else ""})
 
-# Account Size tab — columns A:D (Date, Nifty Close, Deposits/Withdrawals, Portfolio Size)
+# Account Size tab
 account_raw = account_size_tab.get_all_values()
 account_data = []
 if len(account_raw) > 1:
@@ -105,13 +105,12 @@ if len(account_raw) > 1:
                 "portfolio_size": row[3] if len(row) > 3 else ""
             })
 
-# Category snapshots — weekly portfolio value by category
+# Category snapshots
 def parse_num(v):
     if not v: return 0.0
     try: return float(str(v).replace(',','').replace('₹','').replace('(', '-').replace(')', '').strip())
     except: return 0.0
 
-# Read existing snapshots from data.json
 existing_snapshots = []
 try:
     with open('data.json', 'r') as f:
@@ -139,17 +138,14 @@ existing_snapshots = [s for s in existing_snapshots if s['date'] != today_str]
 existing_snapshots.append(today_snapshot)
 existing_snapshots = sorted(existing_snapshots, key=lambda x: x['date'])
 
-# Charges tab — two side-by-side tables
-# Annual Charges:  cols A-D  (idx 0-3):  Financial Year | Cash Charges | F&O Charges | Total
-# Weekly Charges:  cols F-K  (idx 5-10): Week Start | Week End | Cash Charges | F&O Charges | Portfolio Size | Charges % of Portfolio
+# Charges tab
 charges_raw = charges_tab.get_all_values()
 weekly_charges = []
 fy_charges = []
 
-for row in charges_raw[1:]:  # skip header row
+for row in charges_raw[1:]:
     if not row:
         continue
-    # Annual Charges (column A)
     if row[0] and row[0] != 'Financial Year':
         fy_charges.append({
             "fy": row[0],
@@ -157,7 +153,6 @@ for row in charges_raw[1:]:  # skip header row
             "fo_charges": row[2] if len(row) > 2 else "",
             "total": row[3] if len(row) > 3 else "",
         })
-    # Weekly Charges (column F = index 5)
     if len(row) > 5 and row[5] and row[5] != 'Week Start':
         weekly_charges.append({
             "week_start": row[5],
