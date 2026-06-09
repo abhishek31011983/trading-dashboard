@@ -166,6 +166,16 @@ table.t tbody tr:last-child{border-bottom:none;}
 .cat-kpi-name{font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:var(--space-4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .cat-kpi-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);}
 .cat-xirr{font-size:var(--text-xs);color:var(--muted);margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--divider);display:flex;justify-content:space-between;align-items:center;gap:var(--space-2);}
+/* ── CHARTS FOR TRADES PAGE ──────────────────────────────────── */
+.chart-links-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:var(--space-4);}
+.chart-link-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-5);box-shadow:var(--sh-sm);border-top:3px solid;display:flex;flex-direction:column;gap:var(--space-3);min-width:0;}
+.chart-link-name{font-size:var(--text-base);font-weight:700;color:var(--text);}
+.chart-link-badges{display:flex;gap:var(--space-2);flex-wrap:wrap;}
+.chart-link-btn{display:inline-flex;align-items:center;justify-content:center;padding:8px 0;border-radius:var(--radius-md);background:var(--primary-hl);color:var(--primary);font-size:var(--text-xs);font-weight:600;text-decoration:none;border:1px solid rgba(59,130,246,.2);transition:background var(--transition);margin-top:auto;width:100%;}
+.chart-link-btn:hover{background:var(--primary);color:#fff;}
+/* ── POST-EXIT TRACKER PAGE ──────────────────────────────────── */
+.pe-summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--space-4);margin-bottom:var(--space-6);}
+.pe-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-xl);padding:var(--space-5);box-shadow:var(--sh-sm);}
 @media(max-width:768px){
   .app{grid-template-columns:1fr;grid-template-rows:56px auto 1fr;}
   .sidebar{position:static;height:auto;flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid var(--border);padding:var(--space-2);overflow-x:auto;}
@@ -235,6 +245,14 @@ table.t tbody tr:last-child{border-bottom:none;}
     <button class="nav-btn" id="btn-category" onclick="go('category')">
       <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 0 20"/><path d="M2 12h20"/></svg>
       Category
+    </button>
+    <button class="nav-btn" id="btn-charts" onclick="go('charts')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      Charts
+    </button>
+    <button class="nav-btn" id="btn-postexit" onclick="go('postexit')">
+      <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+      Post-Exit
     </button>
   </div>
 
@@ -754,6 +772,79 @@ table.t tbody tr:last-child{border-bottom:none;}
       </div>
     </div>
 
+    <!-- ── CHARTS FOR TRADES PAGE ────────────────────────────── -->
+    <div class="page" id="charts">
+      <div class="ph">
+        <h1>Charts for Trades</h1>
+        <p>TradingView links for open positions — one chart per stock</p>
+      </div>
+      <div class="chart-links-grid" id="charts-grid"></div>
+    </div>
+
+    <!-- ── POST-EXIT TRACKER PAGE ────────────────────────────── -->
+    <div class="page" id="postexit">
+      <div class="ph">
+        <h1>Post-Exit Tracker</h1>
+        <p>How did stocks move after you exited? Spot patterns in your timing</p>
+      </div>
+
+      <div class="pe-summary-grid">
+        <div class="pe-card">
+          <div class="kpi-lbl">Left on Table</div>
+          <div class="kpi-val" id="pe-left-pct">—</div>
+          <div class="kpi-sub">of Cash Long exits — stock rose after</div>
+        </div>
+        <div class="pe-card">
+          <div class="kpi-lbl">Avg Post-Exit Move</div>
+          <div class="kpi-val" id="pe-avg-move">—</div>
+          <div class="kpi-sub">Cash Longs · +ve = stock kept rising</div>
+        </div>
+        <div class="pe-card">
+          <div class="kpi-lbl">Biggest Miss</div>
+          <div class="kpi-val" id="pe-top-miss">—</div>
+          <div class="kpi-sub" id="pe-top-miss-name">—</div>
+        </div>
+      </div>
+
+      <div class="charts-grid" style="margin-bottom:var(--space-4)">
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">Avg Drift After Exit — Cash Longs</div>
+            <div style="font-size:var(--text-xs);color:var(--muted)">How much did stocks move on average after you sold?</div>
+          </div>
+          <div class="chart-wrap" style="height:220px"><canvas id="peTrajChart"></canvas></div>
+        </div>
+        <div class="card">
+          <div class="card-hdr">
+            <div class="card-title">Post-Exit Move by Trade — Cash Longs</div>
+            <div style="font-size:var(--text-xs);color:var(--muted)">
+              <span style="color:var(--error)">■</span> Left on table &nbsp;
+              <span style="color:var(--success)">■</span> Good exit
+            </div>
+          </div>
+          <div class="chart-wrap" style="height:220px"><canvas id="peChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-hdr">
+          <div class="card-title">All Closed Trades — Post-Exit Performance</div>
+          <div style="font-size:var(--text-xs);color:var(--muted)">Sorted newest exit first · % = change vs your exit price</div>
+        </div>
+        <div class="tbl-wrap">
+          <table class="t">
+            <thead>
+              <tr>
+                <th>Name</th><th>Exit Date</th><th>Type</th><th>Instr</th>
+                <th>Exit ₹</th><th>+1D</th><th>+4D</th><th>+7D</th><th>Now</th><th>Verdict</th>
+              </tr>
+            </thead>
+            <tbody id="peBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
   </div>
 
 <script>
@@ -839,6 +930,8 @@ function go(name){
   if(name==='growth') setTimeout(renderGrowth, 80);
   if(name==='charges') renderCharges();
   if(name==='category') renderCategory();
+  if(name==='charts') renderCharts();
+  if(name==='postexit') renderPostExit();
 }
 
 // ── LOAD ───────────────────────────────────────────────────────
@@ -858,6 +951,8 @@ async function loadData(){
     if(active==='growth') setTimeout(renderGrowth, 80);
     if(active==='charges') renderCharges();
     if(active==='category') renderCategory();
+    if(active==='charts') renderCharts();
+    if(active==='postexit') renderPostExit();
     document.getElementById('lastUpd').innerHTML=
       `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Updated ${new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})}`;
   }catch(e){
@@ -1679,6 +1774,270 @@ function renderCharges() {
       </tr>`;
     }).join('');
   }
+}
+
+// ── CHARTS FOR TRADES ──────────────────────────────────────────
+function renderCharts() {
+  const d = window._D;
+  if (!d) return;
+
+  const open = (d.trades || []).filter(t => t.status === 'Open' && t.chart_link && t.chart_link.trim());
+
+  // Deduplicate by name — keep most recent entry date
+  const byName = {};
+  open.forEach(t => {
+    const n = (t.name || '').trim();
+    if (!byName[n]) {
+      byName[n] = t;
+    } else {
+      const existing = parseTradeDate(byName[n].entry_date);
+      const current  = parseTradeDate(t.entry_date);
+      if (current && existing && current > existing) byName[n] = t;
+    }
+  });
+
+  const unique = Object.values(byName).sort((a, b) => {
+    const da = parseTradeDate(a.entry_date), db = parseTradeDate(b.entry_date);
+    if (!da || !db) return 0;
+    return db - da; // newest first
+  });
+
+  const grid = document.getElementById('charts-grid');
+  if (!unique.length) {
+    grid.innerHTML = '<p style="color:var(--muted);padding:var(--space-4)">No open trades with chart links. Add TradingView URLs in column AD of the All Trades sheet.</p>';
+    return;
+  }
+
+  grid.innerHTML = unique.map(t => {
+    const cat = t.category || 'Swing Trade';
+    const col = CAT_COLORS[cat] || '#888';
+    const isFO = t.instrument === 'Futures/Options';
+    return `<div class="chart-link-card" style="border-top-color:${col}">
+      <div class="chart-link-name">${t.name}</div>
+      <div class="chart-link-badges">
+        <span class="badge ${isFO ? 'b-fo' : 'b-cash'}">${isFO ? 'F&O' : 'Cash'}</span>
+        <span class="badge ${t.type === 'Long' ? 'b-long' : 'b-short'}">${t.type || '—'}</span>
+      </div>
+      <div style="font-size:var(--text-xs);color:var(--muted)">Since ${t.entry_date || '—'}</div>
+      <a href="${t.chart_link}" target="_blank" rel="noopener" class="chart-link-btn">Open Chart →</a>
+    </div>`;
+  }).join('');
+}
+
+// ── POST-EXIT TRACKER ──────────────────────────────────────────
+function renderPostExit() {
+  const d = window._D;
+  if (!d) return;
+
+  const allClosed = (d.trades || []).filter(t => t.status === 'Closed');
+
+  // Helper: % move vs exit price, null if data missing
+  function movePct(exitP, laterP) {
+    const ep = pn(exitP), lp = pn(laterP);
+    if (!ep || ep <= 0 || !lp || lp <= 0) return null;
+    return ((lp - ep) / ep) * 100;
+  }
+
+  // Build enriched rows — require at least exit price
+  const rows = allClosed.map(t => {
+    const ep = pn(t.exit_price);
+    if (!ep || ep <= 0) return null;
+    const isLong = t.type === 'Long';
+    const isCash = t.instrument !== 'Futures/Options';
+    const m1  = movePct(t.exit_price, t.price_1d_after);
+    const m4  = movePct(t.exit_price, t.price_4d_after);
+    const m7  = movePct(t.exit_price, t.price_7d_after);
+    const mNow = movePct(t.exit_price, t.current_price);
+    // Use current price as primary "left on table" signal; fallback to 7D then 4D
+    const ref  = mNow !== null ? mNow : (m7 !== null ? m7 : m4);
+    const leftOnTable = ref !== null ? (isLong ? ref > 0 : ref < 0) : null;
+    return { ...t, ep, isLong, isCash, m1, m4, m7, mNow, ref, leftOnTable };
+  }).filter(Boolean);
+
+  // Sort newest exit first
+  const sorted = [...rows].sort((a, b) => {
+    const da = parseTradeDate(a.exit_date), db = parseTradeDate(b.exit_date);
+    if (!da || !db) return 0;
+    return db - da;
+  });
+
+  // Summary: Cash Longs with any price data
+  const longCash = rows.filter(r => r.isLong && r.isCash && r.ref !== null);
+  const leftCount = longCash.filter(r => r.leftOnTable).length;
+  const leftPct   = longCash.length ? Math.round(leftCount / longCash.length * 100) : null;
+  const avgNow    = longCash.filter(r => r.mNow !== null).length
+    ? longCash.filter(r => r.mNow !== null).reduce((s, r) => s + r.mNow, 0) / longCash.filter(r => r.mNow !== null).length
+    : null;
+  const biggestMiss = [...longCash].filter(r => r.leftOnTable).sort((a, b) => b.ref - a.ref)[0];
+
+  // KPI cards
+  const leftEl = document.getElementById('pe-left-pct');
+  leftEl.textContent = leftPct !== null ? leftPct + '%' : '—';
+  leftEl.className = 'kpi-val ' + (leftPct !== null ? (leftPct > 60 ? 'down' : leftPct > 40 ? 'neutral' : 'up') : '');
+
+  const avgEl = document.getElementById('pe-avg-move');
+  avgEl.textContent = avgNow !== null ? (avgNow >= 0 ? '+' : '') + avgNow.toFixed(1) + '%' : '—';
+  avgEl.className = 'kpi-val ' + (avgNow !== null ? (avgNow > 0 ? 'down' : 'up') : '');
+
+  const missEl = document.getElementById('pe-top-miss');
+  const missNameEl = document.getElementById('pe-top-miss-name');
+  if (biggestMiss) {
+    missEl.textContent = (biggestMiss.ref >= 0 ? '+' : '') + biggestMiss.ref.toFixed(1) + '%';
+    missEl.className = 'kpi-val down';
+    missNameEl.textContent = biggestMiss.name + ' · exited ' + (biggestMiss.exit_date || '—');
+  } else {
+    missEl.textContent = '—';
+    missEl.className = 'kpi-val';
+    missNameEl.textContent = 'No misses found';
+  }
+
+  // ── Trajectory chart: avg % move at each timepoint (Cash Longs)
+  dc('peTrajChart');
+  const trajPoints = ['m1','m4','m7','mNow'];
+  const trajLabels = ['+1D', '+4D', '+7D', 'Now'];
+  const trajAvgs = trajPoints.map(k => {
+    const valid = longCash.filter(r => r[k] !== null);
+    return valid.length ? valid.reduce((s, r) => s + r[k], 0) / valid.length : null;
+  });
+  const hasTrajectory = trajAvgs.some(v => v !== null);
+  if (hasTrajectory) {
+    const dark = isDark();
+    const color = dark ? '#3b82f6' : '#2563eb';
+    CI['peTrajChart'] = new Chart(document.getElementById('peTrajChart'), {
+      type: 'line',
+      data: {
+        labels: ['Exit', ...trajLabels],
+        datasets: [{
+          label: 'Avg % move vs exit price',
+          data: [0, ...trajAvgs],
+          borderColor: color,
+          backgroundColor: color + '22',
+          borderWidth: 2.5,
+          pointRadius: 5,
+          pointBackgroundColor: trajAvgs.map((v, i) =>
+            v === null ? 'transparent' : v > 0 ? (dark ? '#f43f5e' : '#e11d48') : (dark ? '#22c55e' : '#16a34a')
+          ).unshift('transparent') && trajAvgs.map((v) =>
+            v === null ? 'transparent' : v > 0 ? (dark ? '#f43f5e' : '#e11d48') : (dark ? '#22c55e' : '#16a34a')
+          ),
+          fill: true,
+          tension: 0.3,
+          spanGaps: true,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                if (ctx.raw === null) return ' No data';
+                const sign = ctx.raw >= 0 ? '+' : '';
+                const n = longCash.filter(r => r[trajPoints[ctx.dataIndex - 1]] !== null).length;
+                return ` Avg: ${sign}${ctx.raw.toFixed(1)}% (${n} trades)`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { color: gc() }, ticks: { color: tc() } },
+          y: {
+            grid: { color: gc() },
+            ticks: { color: tc(), callback: v => (v >= 0 ? '+' : '') + v.toFixed(1) + '%' }
+          }
+        }
+      }
+    });
+  } else {
+    const el = document.getElementById('peTrajChart');
+    if (el) el.parentElement.innerHTML = '<p style="color:var(--muted);font-size:var(--text-xs);padding:var(--space-4)">Add GOOGLEFINANCE formulas to columns AY–BA in your sheet to see the trajectory.</p>';
+  }
+
+  // ── Per-trade bar chart (current price vs exit)
+  dc('peChart');
+  const chartData = [...longCash].filter(r => r.mNow !== null).sort((a, b) => {
+    const da = parseTradeDate(a.exit_date), db = parseTradeDate(b.exit_date);
+    if (!da || !db) return 0;
+    return da - db;
+  });
+  if (chartData.length) {
+    const dark = isDark();
+    const redC   = dark ? 'rgba(244,63,94,0.8)' : 'rgba(225,29,72,0.8)';
+    const greenC = dark ? 'rgba(34,197,94,0.8)' : 'rgba(22,163,74,0.8)';
+    CI['peChart'] = new Chart(document.getElementById('peChart'), {
+      type: 'bar',
+      data: {
+        labels: chartData.map(t => t.name),
+        datasets: [{
+          data: chartData.map(t => parseFloat(t.mNow.toFixed(1))),
+          backgroundColor: chartData.map(t => t.leftOnTable ? redC : greenC),
+          borderRadius: 4, borderWidth: 0,
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              title: items => chartData[items[0].dataIndex].name,
+              label: ctx => {
+                const t = chartData[ctx.dataIndex];
+                const sign = ctx.raw >= 0 ? '+' : '';
+                return [
+                  ` Now: ${sign}${ctx.raw}% vs exit`,
+                  ` Exit ₹${t.exit_price} → ₹${t.current_price}`,
+                  ` ${t.leftOnTable ? '⚠ Left on table' : '✓ Good exit'}`
+                ];
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { color: tc(), font: { size: 10 }, maxRotation: 50 } },
+          y: { grid: { color: gc() }, ticks: { color: tc(), callback: v => (v >= 0 ? '+' : '') + v.toFixed(0) + '%' } }
+        }
+      }
+    });
+  } else {
+    const el = document.getElementById('peChart');
+    if (el) el.parentElement.innerHTML = '<p style="color:var(--muted);font-size:var(--text-xs);padding:var(--space-4)">No Cash Long trades with current price data yet.</p>';
+  }
+
+  // ── Table
+  function fmtMove(pct) {
+    if (pct === null) return '<span style="color:var(--muted)">—</span>';
+    const sign = pct >= 0 ? '+' : '';
+    const cls  = pct > 0 ? 'down' : 'up';
+    return `<span class="mono ${cls}" style="font-size:var(--text-xs);font-weight:600">${sign}${pct.toFixed(1)}%</span>`;
+  }
+
+  const tbody = document.getElementById('peBody');
+  if (!sorted.length) {
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;color:var(--muted)">No closed trades with price data available.</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = sorted.map(t => {
+    const verdictLabel = t.leftOnTable === null ? '—'
+      : t.leftOnTable
+        ? (t.isLong ? '↑ Rose after exit' : '↓ Fell after exit')
+        : (t.isLong ? '↓ Fell after exit' : '↑ Rose after exit');
+    const verdictColor = t.leftOnTable === null ? 'var(--muted)'
+      : t.leftOnTable ? 'var(--error)' : 'var(--success)';
+    return `<tr>
+      <td style="font-weight:600">${t.name}</td>
+      <td>${t.exit_date || '—'}</td>
+      <td><span class="badge ${t.isLong ? 'b-long' : 'b-short'}">${t.type || '—'}</span></td>
+      <td><span class="badge ${t.isCash ? 'b-cash' : 'b-fo'}">${t.isCash ? 'Cash' : 'F&O'}</span></td>
+      <td class="mono">₹${t.exit_price}</td>
+      <td>${fmtMove(t.m1)}</td>
+      <td>${fmtMove(t.m4)}</td>
+      <td>${fmtMove(t.m7)}</td>
+      <td>${fmtMove(t.mNow)}</td>
+      <td style="color:${verdictColor};font-size:var(--text-xs);font-weight:600">${verdictLabel}</td>
+    </tr>`;
+  }).join('');
 }
 
   document.addEventListener('DOMContentLoaded', loadData);
