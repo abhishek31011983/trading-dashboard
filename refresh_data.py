@@ -17,6 +17,7 @@ dash_tab = sheet.worksheet("dashboard")
 all_trades_tab = sheet.worksheet("All Trades")
 account_size_tab = sheet.worksheet("Account Size")
 charges_tab = sheet.worksheet("Charges")
+sector_heatmap_tab = sheet.worksheet("Sector Heat Map")
 
 # 3. Fetch Data
 # Main Metrics
@@ -171,6 +172,17 @@ for row in charges_raw[1:]:  # skip header row
             "charges_pct": row[10] if len(row) > 10 else "",
         })
 
+# Sector Heat Map tab — cols: Date, Strong Sectors, Weak Sectors, Strong Market Cap, Weak Market Cap
+sector_heatmap_raw = sector_heatmap_tab.get_all_values()
+sector_heatmap = {"date": "", "strong_sectors": [], "weak_sectors": [], "strong_mktcap": [], "weak_mktcap": []}
+if len(sector_heatmap_raw) > 1:
+    sector_heatmap["date"] = sector_heatmap_raw[1][0] if sector_heatmap_raw[1] else ""
+    for row in sector_heatmap_raw[1:]:
+        if len(row) > 1 and row[1]: sector_heatmap["strong_sectors"].append(row[1])
+        if len(row) > 2 and row[2]: sector_heatmap["weak_sectors"].append(row[2])
+        if len(row) > 3 and row[3]: sector_heatmap["strong_mktcap"].append(row[3])
+        if len(row) > 4 and row[4]: sector_heatmap["weak_mktcap"].append(row[4])
+
 data = {
     "metrics": metrics,
     "charts": {
@@ -188,6 +200,7 @@ data = {
         "fy": fy_charges
     },
     "category_snapshots": existing_snapshots,
+    "sector_heatmap": sector_heatmap,
     "headers": headers
 }
 
