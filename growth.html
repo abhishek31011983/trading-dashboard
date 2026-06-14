@@ -1,4 +1,4 @@
-html = """<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
 <meta charset="UTF-8">
@@ -135,7 +135,8 @@ function render(rows){
   if(!rows.length) return;
 
   const labels   = rows.map(r=>r.date);
-  const rawVals  = rows.map(r=>r.portfolio_size_n);
+  // Use gross_portfolio (Portfolio Size - MTF Loan) as equity base; fall back to portfolio_size if not available
+  const rawVals  = rows.map(r=>pn(r.gross_portfolio)||r.portfolio_size_n);
   const cashFlow = rows.map(r=>r.deposit_withdrawal_n);
   const niftyRaw = rows.map(r=>r.nifty_close_n);
 
@@ -278,8 +279,4 @@ async function init(){
 init();
 </script>
 </body>
-</html>"""
-
-with open('/home/user/output/growth.html', 'w') as f:
-    f.write(html)
-print(f"Done. {len(html)} chars")
+</html>
