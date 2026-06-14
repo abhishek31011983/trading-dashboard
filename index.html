@@ -1321,7 +1321,8 @@ function renderGrowth(){
   function pn2(v){ if(!v||v==='')return 0; return parseFloat(String(v).replace(/[^0-9.-]/g,''))||0; }
 
   const labels   = data.map(r => r.date);
-  const rawVals  = data.map(r => pn2(r.portfolio_size));
+  // Use gross_portfolio (Portfolio Size - MTF Loan) as equity base; fall back to portfolio_size if not available
+  const rawVals  = data.map(r => pn2(r.gross_portfolio) || pn2(r.portfolio_size));
   const cashFlow = data.map(r => pn2(r.deposit_withdrawal));
   const niftyRaw = data.map(r => pn2(r.nifty_close));
 
