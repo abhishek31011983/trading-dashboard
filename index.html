@@ -1588,7 +1588,7 @@ function renderCategory() {
 
   // Donut chart data — from nearest snapshot
   const snapCats = snap ? snap.categories : {};
-  const donutCats = allCats.filter(c => (snapCats[c]?.deployed||0) > 0 || (catStats[c]?.deployed||0) > 0);
+  const donutCats = allCats.filter(c => !CAT_HIDDEN.includes(c) && ((snapCats[c]?.deployed||0) > 0 || (catStats[c]?.deployed||0) > 0));
   const deployedVals = donutCats.map(c => snapCats[c]?.deployed || catStats[c]?.deployed || 0);
   const currentVals  = donutCats.map(c => snapCats[c]?.current_value || catStats[c]?.currentVal || 0);
   const donutColors  = donutCats.map(c => CAT_COLORS[c] || '#888');
