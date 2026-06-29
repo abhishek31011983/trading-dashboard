@@ -898,40 +898,24 @@ table.t tbody tr:last-child{border-bottom:none;}
         <h1>Holdings Breakdown</h1>
         <p>Open positions by instrument — entry vs current value, % of gross portfolio</p>
       </div>
-
-      <!-- KPI strip -->
       <div class="kpi-panels" id="hldKpis" style="margin-bottom:var(--space-6)"></div>
-
-      <!-- Two-chart row -->
       <div style="display:grid;grid-template-columns:320px 1fr;gap:var(--space-6);margin-bottom:var(--space-6);align-items:start">
-        <!-- Pie / donut -->
         <div class="card" style="padding:var(--space-5)">
-          <div class="card-label" style="font-size:var(--text-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:var(--space-4)">Portfolio Concentration</div>
+          <div style="font-size:var(--text-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:var(--space-4)">Portfolio Concentration</div>
           <canvas id="hldPieChart" width="270" height="270" style="display:block;margin:0 auto"></canvas>
           <div id="hldPieLegend" style="margin-top:var(--space-4);display:flex;flex-direction:column;gap:var(--space-2)"></div>
         </div>
-        <!-- Dual-bar -->
         <div class="card" style="padding:var(--space-5)">
-          <div class="card-label" style="font-size:var(--text-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:var(--space-4)">Entry vs Current Value</div>
+          <div style="font-size:var(--text-xs);font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;margin-bottom:var(--space-4)">Entry vs Current Value</div>
           <div style="position:relative;overflow-y:auto;max-height:500px">
             <canvas id="hldBarChart"></canvas>
           </div>
         </div>
       </div>
-
-      <!-- Table -->
       <div class="card" style="padding:0;overflow:hidden">
         <table class="tbl" style="width:100%">
           <thead>
-            <tr>
-              <th>Instrument</th>
-              <th>Category</th>
-              <th>Qty</th>
-              <th>Entry Value</th>
-              <th>Current Value</th>
-              <th>P&amp;L</th>
-              <th>% of Portfolio</th>
-            </tr>
+            <tr><th>Instrument</th><th>Category</th><th>Qty</th><th>Entry Value</th><th>Current Value</th><th>P&amp;L</th><th>% of Portfolio</th></tr>
           </thead>
           <tbody id="hldTableBody"></tbody>
         </table>
@@ -2272,151 +2256,120 @@ function renderHoldings() {
   const PALETTE = ['#3b82f6','#a78bfa','#f59e0b','#10b981','#06b6d4','#8b5cf6','#ec4899','#f97316','#84cc16','#e879f9',
                    '#38bdf8','#fb7185','#4ade80','#fbbf24','#c084fc','#34d399','#f472b6','#60a5fa'];
 
-  // Gross portfolio from latest account_growth row
   const ag = (d.account_growth || []);
   const latestAG = ag.length ? ag[0] : null;
   function pnAG(v){ if(!v||v==='') return 0; return parseFloat(String(v).replace(/[^0-9.-]/g,''))||0; }
   const grossPortfolio = latestAG ? (pnAG(latestAG.gross_portfolio) || pnAG(latestAG.portfolio_size)) : 0;
 
-  // Open positions grouped by instrument
   const openTrades = (d.trades || []).filter(t => t.status === 'Open');
   const byInstrument = {};
   openTrades.forEach(t => {
-    const name = (t.instrument || 'Unknown').trim();
-    if (!byInstrument[name]) {
-      byInstrument[name] = { name, category: t.category || 'Swing Trade', shares: 0, entryVal: 0, curVal: 0 };
-    }
+    const name = (t.name || t.instrument || 'Unknown').trim();
+    if (!byInstrument[name]) byInstrument[name] = { name, category: t.category || 'Swing Trade', shares: 0, entryVal: 0, curVal: 0 };
     const shares = pn(t.shares) || 0;
     const entry  = pn(t.entry_price) || 0;
-    const cur    = pn(t.current_price) || entry; // fall back to entry if no current price
+    const cur    = pn(t.current_price) || entry;
     byInstrument[name].shares   += shares;
     byInstrument[name].entryVal += shares * entry;
     byInstrument[name].curVal   += shares * cur;
   });
 
-  const holdings = Object.values(byInstrument)
-    .filter(h => h.entryVal > 0)
-    .sort((a, b) => b.curVal - a.curVal);
-
-  const totalEntry = holdings.reduce((s, h) => s + h.entryVal, 0);
-  const totalCur   = holdings.reduce((s, h) => s + h.curVal, 0);
+  const holdings = Object.values(byInstrument).filter(h => h.entryVal > 0).sort((a,b) => b.curVal - a.curVal);
+  const totalEntry = holdings.reduce((s,h) => s + h.entryVal, 0);
+  const totalCur   = holdings.reduce((s,h) => s + h.curVal, 0);
   const totalPnL   = totalCur - totalEntry;
 
-  // KPI strip
   const kpiEl = document.getElementById('hldKpis');
   if (kpiEl) {
     const pnlColor = totalPnL >= 0 ? 'var(--success)' : 'var(--error)';
-    const gpPct = grossPortfolio > 0 ? ((totalCur / grossPortfolio) * 100).toFixed(1) : '—';
+    const gpPct = grossPortfolio > 0 ? ((totalCur/grossPortfolio)*100).toFixed(1) : '—';
     kpiEl.innerHTML = `
       <div class="kpi-panel" style="flex:1;min-width:0"><div class="kpi-val">${holdings.length}</div><div class="kpi-lbl">Open Positions</div></div>
       <div class="kpi-panel" style="flex:1;min-width:0"><div class="kpi-val mono">${fr(totalEntry)}</div><div class="kpi-lbl">Total Entry Value</div></div>
       <div class="kpi-panel" style="flex:1;min-width:0"><div class="kpi-val mono">${fr(totalCur)}</div><div class="kpi-lbl">Total Current Value</div></div>
-      <div class="kpi-panel" style="flex:1;min-width:0"><div class="kpi-val mono" style="color:${pnlColor}">${fr(totalPnL, true)}</div><div class="kpi-lbl">Unrealised P&L</div></div>
+      <div class="kpi-panel" style="flex:1;min-width:0"><div class="kpi-val mono" style="color:${pnlColor}">${fr(totalPnL,true)}</div><div class="kpi-lbl">Unrealised P&L</div></div>
       <div class="kpi-panel" style="flex:1;min-width:0"><div class="kpi-val mono">${fr(grossPortfolio)}</div><div class="kpi-lbl">Gross Portfolio</div></div>
-      <div class="kpi-panel" style="flex:1;min-width:0"><div class="kpi-val mono">${gpPct}%</div><div class="kpi-lbl">Holdings / Portfolio</div></div>
-    `;
+      <div class="kpi-panel" style="flex:1;min-width:0"><div class="kpi-val mono">${gpPct}%</div><div class="kpi-lbl">Holdings / Portfolio</div></div>`;
   }
 
-  // ── PIE CHART (concentration by current value) ──
-  const pieLabels = holdings.map(h => h.name);
-  const pieVals   = holdings.map(h => h.curVal);
-  const pieColors = holdings.map((_, i) => PALETTE[i % PALETTE.length]);
+  const pieLabels = holdings.map(h=>h.name);
+  const pieVals   = holdings.map(h=>h.curVal);
+  const pieColors = holdings.map((_,i)=>PALETTE[i%PALETTE.length]);
 
   if (CI.hldPie) { CI.hldPie.destroy(); delete CI.hldPie; }
   const pieCtx = document.getElementById('hldPieChart');
   if (pieCtx) {
     CI.hldPie = new Chart(pieCtx, {
-      type: 'doughnut',
-      data: { labels: pieLabels, datasets: [{ data: pieVals, backgroundColor: pieColors, borderColor: 'var(--surface)', borderWidth: 3, hoverOffset: 6 }] },
-      options: {
-        responsive: false,
-        cutout: '62%',
-        plugins: {
-          legend: { display: false },
-          tooltip: { callbacks: { label: i => {
-            const pct = grossPortfolio > 0 ? ((i.parsed / grossPortfolio) * 100).toFixed(1) : ((i.parsed / totalCur) * 100).toFixed(1);
+      type:'doughnut',
+      data:{ labels:pieLabels, datasets:[{ data:pieVals, backgroundColor:pieColors, borderColor:'var(--surface)', borderWidth:3, hoverOffset:6 }]},
+      options:{ responsive:false, cutout:'62%',
+        plugins:{ legend:{display:false},
+          tooltip:{callbacks:{label:i=>{
+            const pct = grossPortfolio>0 ? ((i.parsed/grossPortfolio)*100).toFixed(1) : ((i.parsed/totalCur)*100).toFixed(1);
             return ` ${fr(i.parsed)} · ${pct}% of portfolio`;
-          }}}
-        }
-      }
+          }}}}}
     });
   }
 
-  // Pie legend
   const legEl = document.getElementById('hldPieLegend');
   if (legEl) {
-    legEl.innerHTML = holdings.map((h, i) => {
-      const pct = grossPortfolio > 0 ? ((h.curVal / grossPortfolio) * 100).toFixed(1) : '—';
+    legEl.innerHTML = holdings.map((h,i)=>{
+      const pct = grossPortfolio>0 ? ((h.curVal/grossPortfolio)*100).toFixed(1) : '—';
       return `<div style="display:flex;align-items:center;gap:var(--space-2);font-size:var(--text-xs)">
-        <span style="width:10px;height:10px;border-radius:50%;background:${PALETTE[i % PALETTE.length]};flex-shrink:0"></span>
+        <span style="width:10px;height:10px;border-radius:50%;background:${PALETTE[i%PALETTE.length]};flex-shrink:0"></span>
         <span style="flex:1;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.name}</span>
         <span style="color:var(--muted);font-family:var(--font-mono)">${pct}%</span>
       </div>`;
     }).join('');
   }
 
-  // ── BAR CHART (entry vs current, horizontal) ──
-  const barHeight = Math.max(holdings.length * 44, 200);
+  const barHeight = Math.max(holdings.length*44, 200);
   const barCanvas = document.getElementById('hldBarChart');
-  if (barCanvas) barCanvas.style.height = barHeight + 'px';
-
+  if (barCanvas) barCanvas.style.height = barHeight+'px';
   if (CI.hldBar) { CI.hldBar.destroy(); delete CI.hldBar; }
   if (barCanvas) {
-    const gc = 'rgba(45,54,80,0.6)', tc = 'var(--muted)';
+    const gc='rgba(45,54,80,0.6)', tc='var(--muted)';
     CI.hldBar = new Chart(barCanvas, {
-      type: 'bar',
-      data: {
-        labels: holdings.map(h => h.name),
-        datasets: [
-          { label: 'Entry Value',   data: holdings.map(h => h.entryVal), backgroundColor: 'rgba(59,130,246,0.65)', borderColor: '#3b82f6', borderWidth: 1, borderRadius: 3 },
-          { label: 'Current Value', data: holdings.map(h => h.curVal),   backgroundColor: holdings.map(h => h.curVal >= h.entryVal ? 'rgba(34,197,94,0.65)' : 'rgba(244,63,94,0.65)'),
-            borderColor: holdings.map(h => h.curVal >= h.entryVal ? '#22c55e' : '#f43f5e'), borderWidth: 1, borderRadius: 3 }
-        ]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'top', labels: { color: tc, boxWidth: 12, font: { size: 11 } } },
-          tooltip: { callbacks: {
-            label: c => {
-              const h = holdings[c.dataIndex];
-              const pct = grossPortfolio > 0 ? ((c.parsed.x / grossPortfolio) * 100).toFixed(1) : '—';
-              return ` ${c.dataset.label}: ${fr(c.parsed.x)} (${pct}% of portfolio)`;
-            }
-          }}
-        },
-        scales: {
-          x: { grid: { color: gc }, ticks: { color: tc, callback: v => '₹' + (v/1e5).toFixed(1) + 'L' } },
-          y: { grid: { color: gc }, ticks: { color: tc, font: { size: 11 } } }
-        }
-      }
+      type:'bar',
+      data:{ labels:holdings.map(h=>h.name), datasets:[
+        { label:'Entry Value',   data:holdings.map(h=>h.entryVal), backgroundColor:'rgba(59,130,246,0.65)', borderColor:'#3b82f6', borderWidth:1, borderRadius:3 },
+        { label:'Current Value', data:holdings.map(h=>h.curVal),
+          backgroundColor:holdings.map(h=>h.curVal>=h.entryVal?'rgba(34,197,94,0.65)':'rgba(244,63,94,0.65)'),
+          borderColor:holdings.map(h=>h.curVal>=h.entryVal?'#22c55e':'#f43f5e'), borderWidth:1, borderRadius:3 }
+      ]},
+      options:{ indexAxis:'y', responsive:true, maintainAspectRatio:false,
+        plugins:{ legend:{position:'top',labels:{color:tc,boxWidth:12,font:{size:11}}},
+          tooltip:{callbacks:{label:c=>{
+            const pct = grossPortfolio>0 ? ((c.parsed.x/grossPortfolio)*100).toFixed(1) : '—';
+            return ` ${c.dataset.label}: ${fr(c.parsed.x)} (${pct}% of portfolio)`;
+          }}}},
+        scales:{
+          x:{grid:{color:gc},ticks:{color:tc,callback:v=>'₹'+(v/1e5).toFixed(1)+'L'}},
+          y:{grid:{color:gc},ticks:{color:tc,font:{size:11}}}
+        }}
     });
   }
 
-  // ── TABLE ──
   const tbody = document.getElementById('hldTableBody');
   if (tbody) {
-    tbody.innerHTML = holdings.map((h, i) => {
+    tbody.innerHTML = holdings.map((h,i)=>{
       const pnl = h.curVal - h.entryVal;
-      const pnlColor = pnl >= 0 ? 'var(--success)' : 'var(--error)';
-      const gpPct = grossPortfolio > 0 ? ((h.curVal / grossPortfolio) * 100).toFixed(1) : '—';
-      const barW  = grossPortfolio > 0 ? Math.min((h.curVal / grossPortfolio) * 100, 100).toFixed(1) : 0;
+      const pnlColor = pnl>=0?'var(--success)':'var(--error)';
+      const gpPct = grossPortfolio>0 ? ((h.curVal/grossPortfolio)*100).toFixed(1) : '—';
+      const barW  = grossPortfolio>0 ? Math.min((h.curVal/grossPortfolio)*100,100).toFixed(1) : 0;
       return `<tr>
-        <td style="font-weight:600;display:flex;align-items:center;gap:var(--space-2)">
-          <span style="width:8px;height:8px;border-radius:50%;background:${PALETTE[i % PALETTE.length]};flex-shrink:0;display:inline-block"></span>
-          ${h.name}
+        <td style="font-weight:600">
+          <span style="width:8px;height:8px;border-radius:50%;background:${PALETTE[i%PALETTE.length]};display:inline-block;margin-right:6px;vertical-align:middle"></span>${h.name}
         </td>
         <td><span style="font-size:var(--text-xs);padding:2px 8px;border-radius:var(--radius-full);background:var(--surface-2);color:var(--muted)">${h.category}</span></td>
-        <td class="mono">${h.shares % 1 === 0 ? h.shares : h.shares.toFixed(2)}</td>
+        <td class="mono">${h.shares%1===0?h.shares:h.shares.toFixed(2)}</td>
         <td class="mono">${fr(h.entryVal)}</td>
         <td class="mono">${fr(h.curVal)}</td>
-        <td class="mono" style="color:${pnlColor}">${fr(pnl, true)}</td>
+        <td class="mono" style="color:${pnlColor}">${fr(pnl,true)}</td>
         <td>
           <div style="display:flex;align-items:center;gap:var(--space-2)">
             <div style="flex:1;height:5px;background:var(--surface-2);border-radius:3px;overflow:hidden;min-width:60px">
-              <div style="height:100%;width:${barW}%;background:${PALETTE[i % PALETTE.length]};border-radius:3px"></div>
+              <div style="height:100%;width:${barW}%;background:${PALETTE[i%PALETTE.length]};border-radius:3px"></div>
             </div>
             <span class="mono" style="font-size:var(--text-xs);color:var(--muted);min-width:36px">${gpPct}%</span>
           </div>
