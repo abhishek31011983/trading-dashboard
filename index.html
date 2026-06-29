@@ -2263,7 +2263,8 @@ function renderHoldings() {
   function pnAG(v){ if(!v||v==='') return 0; return parseFloat(String(v).replace(/[^0-9.-]/g,''))||0; }
   const grossPortfolio = latestAG ? (pnAG(latestAG.gross_portfolio) || pnAG(latestAG.portfolio_size)) : 0;
 
-  const openTrades = (d.trades || []).filter(t => t.status === 'Open');
+  const INST_HIDDEN = ['Futures/Options','Futures'];
+  const openTrades = (d.trades || []).filter(t => t.status === 'Open' && !INST_HIDDEN.includes(t.instrument) && !CAT_HIDDEN.includes(t.category));
   const byInstrument = {};
   openTrades.forEach(t => {
     const name = (t.name || t.instrument || 'Unknown').trim();
