@@ -16,6 +16,7 @@ sheet = client.open_by_key('1hqg0c7PGiEaxC-PpOuyCSfivwyhPKgS0mpbNIa55Zio')
 dash_tab = sheet.worksheet("dashboard")
 all_trades_tab = sheet.worksheet("All Trades")
 account_size_tab = sheet.worksheet("Account Size")
+account_size_vicky_tab = sheet.worksheet("Account Size - Vicky")
 charges_tab = sheet.worksheet("Charges")
 sector_heatmap_tab = sheet.worksheet("Sector Heat Map")
 
@@ -110,6 +111,20 @@ if len(account_raw) > 1:
                 "gross_portfolio": row[8] if len(row) > 8 else ""
             })
 
+# Account Size - Vicky tab
+vicky_raw = account_size_vicky_tab.get_all_values()
+vicky_data = []
+if len(vicky_raw) > 1:
+    for row in vicky_raw[1:]:
+        if len(row) >= 4 and row[0]:
+            vicky_data.append({
+                "date": row[0],
+                "nifty_close": row[1] if len(row) > 1 else "",
+                "deposit_withdrawal": row[2] if len(row) > 2 else "",
+                "portfolio_size": row[3] if len(row) > 3 else "",
+                "gross_portfolio": row[8] if len(row) > 8 else ""
+            })
+
 # Category snapshots — weekly portfolio value by category
 def parse_num(v):
     if not v: return 0.0
@@ -196,6 +211,7 @@ data = {
         "derivatives": derivatives_risk_data
     },
     "account_growth": account_data,
+    "account_growth_vicky": vicky_data,
     "charges": {
         "weekly": weekly_charges,
         "fy": fy_charges
